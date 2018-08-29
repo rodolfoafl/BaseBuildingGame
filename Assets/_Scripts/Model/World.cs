@@ -59,8 +59,6 @@ public class World {
         }
     }
 
-
-
     public Tile GetTileAt(int x, int y)
     {
         if(x > width || x < 0 || y > height || y < 0)

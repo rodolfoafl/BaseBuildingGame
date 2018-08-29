@@ -2,14 +2,46 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class WorldController : MonoBehaviour {
+
+    static WorldController _instance;
+    public static WorldController Instance
+    {
+        get
+        {
+            return _instance;
+        }
+        protected set
+        {
+            _instance = value;
+        }
+    }
 
     [SerializeField] Sprite floorSprite;
 
     World world;
+    public World World
+    {
+        get
+        {
+            return world;
+        }
 
-	// Use this for initialization
-	void Start () {
+        set
+        {
+            world = value;
+        }
+    }
+
+    // Use this for initialization
+    void Start () {
+        if(_instance != null)
+        {
+            Debug.LogError("There should never be more than one WorldController");
+        }
+        _instance = this;
+
         world = new World();
         //world.RandomizeTiles();
 
@@ -23,25 +55,28 @@ public class WorldController : MonoBehaviour {
                 tile_go.name = "Tile_" + x + "_" + y;
                 tile_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
 
+                tile_go.transform.SetParent(transform, true);
+
                 tile_go.AddComponent<SpriteRenderer>();
+
+                tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
             }
         }
 
         world.RandomizeTiles();
-
 	}
 
-    float randomizeTileTimer = 2f;
+    //float randomizeTileTimer = 2f;
 
     void Update()
     {
-        randomizeTileTimer -= Time.deltaTime;
+        /*randomizeTileTimer -= Time.deltaTime;
 
         if(randomizeTileTimer < 0)
         {
             world.RandomizeTiles();
             randomizeTileTimer = 2f;
-        }
+        }*/
     }
 
     void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
@@ -59,6 +94,14 @@ public class WorldController : MonoBehaviour {
         {
             Debug.LogError("OnTileTypeChanged - Unrecognized tile type!");
         }
+    }
+
+    public Tile GetTileAtWorldCoordinate(Vector3 coord)
+    {
+        int x = Mathf.FloorToInt(coord.x);
+        int y = Mathf.FloorToInt(coord.y);
+
+        return WorldController.Instance.World.GetTileAt(x, y);
     }
 
 }

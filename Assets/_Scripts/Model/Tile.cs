@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Tile {
 
@@ -9,7 +10,10 @@ public class Tile {
         Floor
     };
 
-    TileType type = TileType.Empty;
+    private TileType _type = TileType.Empty;
+
+    Action<Tile> cbTileTypeChanged;
+
     LooseObject looseObject;
     InstalledObject installedObject;
 
@@ -20,13 +24,18 @@ public class Tile {
     {
         get
         {
-            return type;
+            return _type;
         }
 
         set
         {
-            type = value;
+            TileType oldType = _type;
 
+            _type = value;
+            if (cbTileTypeChanged != null && oldType != _type)
+            {
+                cbTileTypeChanged(this);
+            }
         }
     }
 
@@ -51,6 +60,16 @@ public class Tile {
         this.world = world;
         this.x = x;
         this.y = y;
+    }
+
+    public void RegisterTileTypeChangedCallback(Action<Tile> callback)
+    {
+        cbTileTypeChanged += callback;
+    }
+
+    public void UngisterTileTypeChangedCallback(Action<Tile> callback)
+    {
+        cbTileTypeChanged -= callback;
     }
 
 }
