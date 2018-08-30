@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class MouseController : MonoBehaviour {
 
     [SerializeField] GameObject cursorPrefab;
     [SerializeField] float maxZoomIn;
     [SerializeField] float maxZoomOut;
+
+    Tile.TileType buildModeTile = Tile.TileType.Floor;
 
     Vector3 lastFramePosition;
     Vector3 dragStartPosition;
@@ -31,21 +34,6 @@ public class MouseController : MonoBehaviour {
         lastFramePosition.z = 0;
     }
 
-    /*void UpdateCursor()
-    {
-        Tile tileUnderMouse = WorldController.Instance.GetTileAtWorldCoordinate(currentFramePosition);
-        if (tileUnderMouse != null)
-        {
-            cursorPrefab.SetActive(true);
-            Vector3 cursorPosition = new Vector3(tileUnderMouse.X, tileUnderMouse.Y, 0);
-            cursorPrefab.transform.position = cursorPosition;
-        }
-        else
-        {
-            cursorPrefab.SetActive(false);
-        }
-    }*/
-
     void UpdateCameraMovement()
     {
         if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
@@ -60,6 +48,11 @@ public class MouseController : MonoBehaviour {
 
     void UpdateDragging()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             dragStartPosition = currentFramePosition;
@@ -67,8 +60,8 @@ public class MouseController : MonoBehaviour {
 
         int start_x = Mathf.FloorToInt(dragStartPosition.x);
         int end_x = Mathf.FloorToInt(currentFramePosition.x);
-        int start_y = Mathf.CeilToInt(dragStartPosition.y);
-        int end_y = Mathf.CeilToInt(currentFramePosition.y);
+        int start_y = Mathf.FloorToInt(dragStartPosition.y);
+        int end_y = Mathf.FloorToInt(currentFramePosition.y);
 
         if (end_x < start_x)
         {
@@ -118,10 +111,20 @@ public class MouseController : MonoBehaviour {
                     Tile t = WorldController.Instance.World.GetTileAt(x, y);
                     if (t != null)
                     {
-                        t.Type = Tile.TileType.Floor;
+                        t.Type = buildModeTile;
                     }
                 }
             }
         }
+    }
+
+    public void SetMode_BuildFloor()
+    {
+        buildModeTile = Tile.TileType.Floor;
+    }
+
+    public void SetMode_Bulldoze()
+    {
+        buildModeTile = Tile.TileType.Empty;
     }
 }

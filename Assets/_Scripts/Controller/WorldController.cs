@@ -19,6 +19,7 @@ public class WorldController : MonoBehaviour {
     }
 
     [SerializeField] Sprite floorSprite;
+    Dictionary<Tile, GameObject> tileGameObjectMap;
 
     World world;
     public World World
@@ -43,6 +44,8 @@ public class WorldController : MonoBehaviour {
         _instance = this;
 
         world = new World();
+
+        tileGameObjectMap = new Dictionary<Tile, GameObject>();
         //world.RandomizeTiles();
 
         for (int x = 0; x < world.Width; x++)
@@ -52,6 +55,8 @@ public class WorldController : MonoBehaviour {
                 Tile tile_data = world.GetTileAt(x, y);
 
                 GameObject tile_go = new GameObject();
+
+                tileGameObjectMap.Add(tile_data, tile_go);
                 tile_go.name = "Tile_" + x + "_" + y;
                 tile_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
 
@@ -59,7 +64,8 @@ public class WorldController : MonoBehaviour {
 
                 tile_go.AddComponent<SpriteRenderer>();
 
-                tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
+                //tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
+                tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
 
@@ -79,7 +85,7 @@ public class WorldController : MonoBehaviour {
         }*/
     }
 
-    void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
+    /*void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
     {
 
         if (tile_data.Type == Tile.TileType.Floor)
@@ -87,6 +93,29 @@ public class WorldController : MonoBehaviour {
             tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
         }
         else if(tile_data.Type == Tile.TileType.Empty)
+        {
+            tile_go.GetComponent<SpriteRenderer>().sprite = null;
+        }
+        else
+        {
+            Debug.LogError("OnTileTypeChanged - Unrecognized tile type!");
+        }
+    }*/
+
+    void OnTileTypeChanged(Tile tile_data)
+    {
+        GameObject tile_go = tileGameObjectMap[tile_data];
+        if (!tileGameObjectMap.TryGetValue(tile_data, out tile_go))
+        {
+            Debug.LogError("tileGameObjectMap doesn't contain the tile_data");
+            return;
+        }
+
+        if (tile_data.Type == Tile.TileType.Floor)
+        {
+            tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
+        }
+        else if (tile_data.Type == Tile.TileType.Empty)
         {
             tile_go.GetComponent<SpriteRenderer>().sprite = null;
         }
