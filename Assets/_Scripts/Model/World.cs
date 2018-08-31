@@ -1,9 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class World {
     Tile[,] tiles;
+    Dictionary<string, InstalledObject> installedObjectsPrototypes;
+
+    Action<InstalledObject> cbInstalledObjectCreated;
+
     int width;
     int height;
 
@@ -38,6 +43,35 @@ public class World {
         }
 
         Debug.Log("World created with " + (width * height) + " tiles.");
+
+        CreateInstalledObjectPrototypes();
+    }
+
+    void CreateInstalledObjectPrototypes()
+    {
+        installedObjectsPrototypes = new Dictionary<string, InstalledObject>();
+        installedObjectsPrototypes.Add("Wall", InstalledObject.CreatePrototype("Wall", 0, 1, 1));
+    }
+
+    public void PlaceInstalledObject(string objectType, Tile t)
+    {
+        //Debug.Log("PlaceInstalledObject");
+        if (!installedObjectsPrototypes.ContainsKey(objectType))
+        {
+            Debug.LogError("installedObjectPrototypes doesn't contain a proto for key: " + objectType);
+            return;
+        }
+
+        InstalledObject obj = InstalledObject.PlaceInstance(installedObjectsPrototypes[objectType], t);
+        if(obj == null)
+        {
+            return;
+        }
+
+        if(cbInstalledObjectCreated != null)
+        {
+            cbInstalledObjectCreated(obj);
+        }
     }
 
     public void RandomizeTiles()
@@ -47,7 +81,7 @@ public class World {
         {
             for (int y = 0; y < height; y++)
             {
-                if(Random.Range(0, 2) == 0)
+                if(UnityEngine.Random.Range(0, 2) == 0)
                 {
                     tiles[x, y].Type = Tile.TileType.Empty;
                 }
@@ -67,5 +101,15 @@ public class World {
             return null;
         }
         return tiles[x, y];
+    }
+
+    public void RegisterInstalledObjectCreated(Action<InstalledObject> callback)
+    {
+        cbInstalledObjectCreated += callback;
+    }
+
+    public void UnregisterInstalledObjectCreated(Action<InstalledObject> callback)
+    {
+        cbInstalledObjectCreated -= callback;
     }
 }

@@ -19,7 +19,9 @@ public class WorldController : MonoBehaviour {
     }
 
     [SerializeField] Sprite floorSprite;
+    [SerializeField] Sprite wallSprite;
     Dictionary<Tile, GameObject> tileGameObjectMap;
+    Dictionary<InstalledObject, GameObject> installedObjectGameObjectMap;
 
     World world;
     public World World
@@ -44,8 +46,10 @@ public class WorldController : MonoBehaviour {
         _instance = this;
 
         world = new World();
+        world.RegisterInstalledObjectCreated(OnInstalledObjectCreated);
 
         tileGameObjectMap = new Dictionary<Tile, GameObject>();
+        installedObjectGameObjectMap = new Dictionary<InstalledObject, GameObject>();
         //world.RandomizeTiles();
 
         for (int x = 0; x < world.Width; x++)
@@ -131,6 +135,28 @@ public class WorldController : MonoBehaviour {
         int y = Mathf.FloorToInt(coord.y);
 
         return WorldController.Instance.World.GetTileAt(x, y);
+    }
+
+    public void OnInstalledObjectCreated(InstalledObject obj) 
+    {
+        //Debug.Log("OnInstalledObjectCreated");
+        GameObject obj_go = new GameObject();
+
+        installedObjectGameObjectMap.Add(obj, obj_go);
+        obj_go.name = obj.ObjectType + "_" + obj.Tile.X + "_" + obj.Tile.Y;
+        obj_go.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0);
+
+        obj_go.transform.SetParent(transform, true);
+
+        obj_go.AddComponent<SpriteRenderer>().sprite = wallSprite;
+
+        //tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
+        obj.RegisterOnChangedCallback(OnInstalledObjectChanged);
+    }
+
+    void OnInstalledObjectChanged(InstalledObject obj)
+    {
+        Debug.LogError("Not Implemented");
     }
 
 }

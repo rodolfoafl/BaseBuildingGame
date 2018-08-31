@@ -10,6 +10,8 @@ public class MouseController : MonoBehaviour {
     [SerializeField] float maxZoomOut;
 
     Tile.TileType buildModeTile = Tile.TileType.Floor;
+    bool buildModeIsObjects = false;
+    string buildModeObjectType;
 
     Vector3 lastFramePosition;
     Vector3 dragStartPosition;
@@ -109,9 +111,17 @@ public class MouseController : MonoBehaviour {
                 for (int y = start_y; y <= end_y; y++)
                 {
                     Tile t = WorldController.Instance.World.GetTileAt(x, y);
+                   
                     if (t != null)
                     {
-                        t.Type = buildModeTile;
+                        if (buildModeIsObjects)
+                        {
+                            WorldController.Instance.World.PlaceInstalledObject(buildModeObjectType, t);
+                        }
+                        else
+                        {
+                            t.Type = buildModeTile;
+                        }
                     }
                 }
             }
@@ -120,11 +130,19 @@ public class MouseController : MonoBehaviour {
 
     public void SetMode_BuildFloor()
     {
+        buildModeIsObjects = false;
         buildModeTile = Tile.TileType.Floor;
     }
 
     public void SetMode_Bulldoze()
     {
+        buildModeIsObjects = false;
         buildModeTile = Tile.TileType.Empty;
+    }
+
+    public void SetMode_BuildInstalledObject(string objectType)
+    {
+        buildModeIsObjects = true;
+        buildModeObjectType = objectType;
     }
 }
