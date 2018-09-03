@@ -55,6 +55,22 @@ public class Tile {
         }
     }
 
+    public InstalledObject InstalledObject
+    {
+        get
+        {
+            return installedObject;
+        }
+    }
+
+    public World World
+    {
+        get
+        {
+            return world;
+        }
+    }
+
     public Tile(World world, int x, int y)
     {
         this.world = world;

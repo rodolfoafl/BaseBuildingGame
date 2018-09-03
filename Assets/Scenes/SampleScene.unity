@@ -522,7 +522,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 25
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -677,7 +677,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -889,7 +889,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorSprite: {fileID: 21300000, guid: fc67ccf5141526746aed2b3869223637, type: 3}
-  wallSprite: {fileID: 21300000, guid: 5550e019bc24ca94ebf209a42dd79857, type: 3}
+  emptySprite: {fileID: 21300000, guid: b797700b6c01adb4c9c3d73e4336c324, type: 3}
 --- !u!4 &1568780091
 Transform:
   m_ObjectHideFlags: 0

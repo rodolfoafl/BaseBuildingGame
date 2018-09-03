@@ -19,9 +19,12 @@ public class WorldController : MonoBehaviour {
     }
 
     [SerializeField] Sprite floorSprite;
-    [SerializeField] Sprite wallSprite;
+    [SerializeField] Sprite emptySprite;
+
     Dictionary<Tile, GameObject> tileGameObjectMap;
     Dictionary<InstalledObject, GameObject> installedObjectGameObjectMap;
+
+    Dictionary<string, Sprite> installedObjectsSprites;
 
     World world;
     public World World
@@ -38,8 +41,11 @@ public class WorldController : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
-        if(_instance != null)
+    void Start ()
+    {
+        LoadWallSpritesFromResource();
+
+        if (_instance != null)
         {
             Debug.LogError("There should never be more than one WorldController");
         }
@@ -66,15 +72,29 @@ public class WorldController : MonoBehaviour {
 
                 tile_go.transform.SetParent(transform, true);
 
-                tile_go.AddComponent<SpriteRenderer>();
+                tile_go.AddComponent<SpriteRenderer>().sprite = emptySprite;
 
                 //tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
                 tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
 
-        world.RandomizeTiles();
-	}
+        Camera.main.transform.position = new Vector3(world.Width / 2, world.Height / 2, Camera.main.transform.position.z);
+
+        //world.RandomizeTiles();
+    }
+
+    private void LoadWallSpritesFromResource()
+    {
+        installedObjectsSprites = new Dictionary<string, Sprite>();
+        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/Wall/");
+
+        foreach (Sprite s in sprites)
+        {
+            //Debug.Log(s);
+            installedObjectsSprites[s.name] = s;
+        }
+    }
 
     //float randomizeTileTimer = 2f;
 
@@ -148,15 +168,65 @@ public class WorldController : MonoBehaviour {
 
         obj_go.transform.SetParent(transform, true);
 
-        obj_go.AddComponent<SpriteRenderer>().sprite = wallSprite;
+        obj_go.AddComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
 
         //tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
         obj.RegisterOnChangedCallback(OnInstalledObjectChanged);
     }
 
+    Sprite GetSpriteForInstalledObject(InstalledObject obj)
+    {
+        if (!obj.LinksToNeighbour)
+        {
+            return installedObjectsSprites[obj.ObjectType];
+        }
+
+        string spriteName = obj.ObjectType + "_";
+
+        int x = obj.Tile.X;
+        int y = obj.Tile.Y;
+
+        Tile t;
+        t = World.GetTileAt(x, y + 1);
+        if(t != null && t.InstalledObject != null && t.InstalledObject.ObjectType == obj.ObjectType)
+        {
+            spriteName += "N";
+        }
+        t = World.GetTileAt(x + 1, y);
+        if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType == obj.ObjectType)
+        {
+            spriteName += "E";
+        }
+        t = World.GetTileAt(x, y - 1);
+        if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType == obj.ObjectType)
+        {
+            spriteName += "S";
+        }
+        t = World.GetTileAt(x - 1, y);
+        if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType == obj.ObjectType)
+        {
+            spriteName += "W";
+        }
+
+        if (!installedObjectsSprites.ContainsKey(spriteName))
+        {
+            Debug.LogError("GetSpriteForInstalledObject -- No sprites with name: " + spriteName);
+            return null;
+        }
+
+        return installedObjectsSprites[spriteName];
+    }
+
     void OnInstalledObjectChanged(InstalledObject obj)
     {
-        Debug.LogError("Not Implemented");
+        GameObject obj_go = installedObjectGameObjectMap[obj];
+        if (!installedObjectGameObjectMap.TryGetValue(obj, out obj_go))
+        {
+            Debug.LogError("Trying to change visual for installedObject not in map");
+            return;
+        }
+
+        obj_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
     }
 
 }
