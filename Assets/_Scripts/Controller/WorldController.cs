@@ -41,7 +41,7 @@ public class WorldController : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start ()
+    void Awake ()
     {
         LoadWallSpritesFromResource();
 
@@ -75,9 +75,11 @@ public class WorldController : MonoBehaviour {
                 tile_go.AddComponent<SpriteRenderer>().sprite = emptySprite;
 
                 //tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
-                tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
+                //tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
+
+        World.RegisterTileChanged(OnTileTypeChanged);
 
         Camera.main.transform.position = new Vector3(world.Width / 2, world.Height / 2, Camera.main.transform.position.z);
 
@@ -169,6 +171,7 @@ public class WorldController : MonoBehaviour {
         obj_go.transform.SetParent(transform, true);
 
         obj_go.AddComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
+        obj_go.GetComponent<SpriteRenderer>().sortingOrder = 1;
 
         //tile_data.RegisterTileTypeChangedCallback((tile) => { OnTileTypeChanged(tile, tile_go); });
         obj.RegisterOnChangedCallback(OnInstalledObjectChanged);
@@ -227,6 +230,7 @@ public class WorldController : MonoBehaviour {
         }
 
         obj_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
+        obj_go.GetComponent<SpriteRenderer>().sortingOrder = 1;
     }
 
 }

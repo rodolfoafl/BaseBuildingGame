@@ -8,6 +8,9 @@ public class World {
     Dictionary<string, InstalledObject> installedObjectsPrototypes;
 
     Action<InstalledObject> cbInstalledObjectCreated;
+    Action<Tile> cbTileChanged;
+
+    public Queue<Job> jobQueue;
 
     int width;
     int height;
@@ -30,6 +33,8 @@ public class World {
 
     public World(int width = 100, int height = 100)
     {
+        jobQueue = new Queue<Job>();
+
         this.width = width;
         this.height = height;
 
@@ -39,6 +44,7 @@ public class World {
             for(int y = 0; y < height; y++)
             {
                 tiles[x, y] = new Tile(this, x, y);
+                tiles[x, y].RegisterTileTypeChangedCallback(OnTileChanged);
             }
         }
 
@@ -110,5 +116,29 @@ public class World {
     public void UnregisterInstalledObjectCreated(Action<InstalledObject> callback)
     {
         cbInstalledObjectCreated -= callback;
+    }
+
+    public void RegisterTileChanged(Action<Tile> callback)
+    {
+        cbTileChanged += callback;
+    }
+
+    public void UnregisterTileChanged(Action<Tile> callback)
+    {
+        cbTileChanged -= callback;
+    }
+
+    void OnTileChanged(Tile t)
+    {
+        if(cbTileChanged == null)
+        {
+            return; 
+        }
+        cbTileChanged(t);
+    }
+
+    public bool IsInstalledObjectPlacementValid(string installedObjectType, Tile t)
+    {
+        return installedObjectsPrototypes[installedObjectType].IsValidPosition(t);
     }
 }

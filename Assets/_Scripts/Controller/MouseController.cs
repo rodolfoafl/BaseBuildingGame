@@ -116,7 +116,22 @@ public class MouseController : MonoBehaviour {
                     {
                         if (buildModeIsObjects)
                         {
-                            WorldController.Instance.World.PlaceInstalledObject(buildModeObjectType, t);
+                            string installedObjectType = buildModeObjectType;
+
+                            if(WorldController.Instance.World.IsInstalledObjectPlacementValid(installedObjectType, t) && t.pendingInstalledObjectJob == null)
+                            {
+                                Job j = new Job(t, (theJob) => {
+                                    WorldController.Instance.World.PlaceInstalledObject(installedObjectType, t);
+                                    t.pendingInstalledObjectJob = null;
+                                });
+
+                                t.pendingInstalledObjectJob = j;
+                                j.RegisterJobCancelCallback((theJob) => {
+                                    theJob.Tile.pendingInstalledObjectJob = null;
+                                });
+
+                                WorldController.Instance.World.jobQueue.Enqueue(j);
+                            }                           
                         }
                         else
                         {

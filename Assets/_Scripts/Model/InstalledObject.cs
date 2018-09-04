@@ -126,6 +126,11 @@ public class InstalledObject {
 
     public bool IsValidPosition(Tile t)
     {
+        return funcPositionValidation(t);
+    }
+
+    public bool __IsValidPosition(Tile t)
+    {
         if(t.Type != Tile.TileType.Floor)
         {
             return false;
