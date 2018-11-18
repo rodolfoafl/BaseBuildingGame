@@ -21,6 +21,7 @@ public class WorldController : MonoBehaviour {
                 Tile tile_data = _world.GetTileAt(x, y);
                 tile_go.name = "Tile_" + x + "_" + y;
                 tile_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
+                tile_go.transform.SetParent(this.transform, true);
 
                 tile_go.AddComponent<SpriteRenderer>();
 
