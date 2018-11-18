@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ public class Tile {
     public enum TileType { Empty, Floor };
 
     TileType _type = TileType.Empty;
+
+    Action<Tile> _cbTileTypeChanged;
 
     LooseObject _looseObject;
     InstalledObject _installedObject;
@@ -25,7 +28,14 @@ public class Tile {
 
         set
         {
-            _type = value;
+            if (Type != value)
+            {
+                _type = value;
+                if (_cbTileTypeChanged != null)
+                {
+                    _cbTileTypeChanged(this);
+                }
+            }
         }
     }
 
@@ -51,5 +61,15 @@ public class Tile {
         this._world = world;
         this._x = x;
         this._y = y;
+    }
+
+    public void RegisterTileTypeChangedCallback(Action<Tile> callback)
+    {
+        _cbTileTypeChanged += callback;
+    }
+
+    public void UnregisterTileTypeChangedCallback(Action<Tile> callback)
+    {
+        _cbTileTypeChanged -= callback;
     }
 }

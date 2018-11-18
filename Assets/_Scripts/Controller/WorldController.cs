@@ -23,6 +23,8 @@ public class WorldController : MonoBehaviour {
                 tile_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
 
                 tile_go.AddComponent<SpriteRenderer>();
+
+                tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); });
             }
         }
 
