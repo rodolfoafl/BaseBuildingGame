@@ -72,4 +72,12 @@ public class WorldController : MonoBehaviour {
             tile_go.GetComponent<SpriteRenderer>().sprite = null;
         }
     }
+
+    public Tile GetTileAtWorldCoordinate(Vector3 coordinate)
+    {
+        int x = Mathf.FloorToInt(coordinate.x);
+        int y = Mathf.FloorToInt(coordinate.y);
+
+        return Instance.World.GetTileAt(x, y);
+    }
 }
