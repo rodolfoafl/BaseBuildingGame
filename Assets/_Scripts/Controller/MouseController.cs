@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class MouseController : MonoBehaviour {
 
@@ -10,6 +11,8 @@ public class MouseController : MonoBehaviour {
 
     [SerializeField] float _mouseZoomInMax;
     [SerializeField] float _mouseZoomOutMax;
+
+    Tile.TileType _buildModeTile = Tile.TileType.Floor;
 
     Vector3 _lastFramePosition;
     Vector3 _currFramePosition;
@@ -39,6 +42,11 @@ public class MouseController : MonoBehaviour {
 
     void UpdateDragging()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
         //Start mouse drag
         if (Input.GetMouseButtonDown(0))
         {
@@ -104,7 +112,7 @@ public class MouseController : MonoBehaviour {
                     Tile t = WorldController.Instance.World.GetTileAt(x, y);
                     if (t != null)
                     {
-                        t.Type = Tile.TileType.Floor;
+                        t.Type = _buildModeTile;
                         
                     }
                 }
@@ -138,5 +146,13 @@ public class MouseController : MonoBehaviour {
         }
     }*/
 
-  
+    public void SetMode_BuildFloor()
+    {
+        _buildModeTile = Tile.TileType.Floor;
+    }
+
+    public void SetMode_Bulldoze()
+    {
+        _buildModeTile = Tile.TileType.Empty;
+    }
 }
