@@ -6,19 +6,15 @@ using UnityEngine.EventSystems;
 public class MouseController : MonoBehaviour {
 
     [SerializeField] Transform _cursorGameObjectsContainer;
-
     [SerializeField] GameObject _circleCursorPrefab;
-
     [SerializeField] float _mouseZoomInMax;
     [SerializeField] float _mouseZoomOutMax;
 
+    bool _buildModeIsObject = false;
     TileType _buildModeTile = TileType.Floor;
-
     Vector3 _lastFramePosition;
     Vector3 _currFramePosition;
-
     Vector3 _dragStartPosition;
-
     List<GameObject> _dragPreviewGameObjects;
 
     void Start()
@@ -110,10 +106,17 @@ public class MouseController : MonoBehaviour {
                 for (int y = start_y; y <= end_y; y++)
                 {
                     Tile t = WorldController.Instance.World.GetTileAt(x, y);
+
                     if (t != null)
                     {
-                        t.Type = _buildModeTile;
-                        
+                        if (_buildModeIsObject)
+                        {
+                            
+                        }
+                        else
+                        {
+                            t.Type = _buildModeTile;
+                        }
                     }
                 }
             }
@@ -148,11 +151,18 @@ public class MouseController : MonoBehaviour {
 
     public void SetMode_BuildFloor()
     {
+        _buildModeIsObject = false;
         _buildModeTile = TileType.Floor;
     }
 
     public void SetMode_Bulldoze()
     {
+        _buildModeIsObject = false;
         _buildModeTile = TileType.Empty;
+    }
+
+    public void SetMode_BuildWall()
+    {
+        _buildModeIsObject = true;
     }
 }
