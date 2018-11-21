@@ -12,7 +12,7 @@ public class MouseController : MonoBehaviour {
     [SerializeField] float _mouseZoomInMax;
     [SerializeField] float _mouseZoomOutMax;
 
-    Tile.TileType _buildModeTile = Tile.TileType.Floor;
+    TileType _buildModeTile = TileType.Floor;
 
     Vector3 _lastFramePosition;
     Vector3 _currFramePosition;
@@ -148,11 +148,11 @@ public class MouseController : MonoBehaviour {
 
     public void SetMode_BuildFloor()
     {
-        _buildModeTile = Tile.TileType.Floor;
+        _buildModeTile = TileType.Floor;
     }
 
     public void SetMode_Bulldoze()
     {
-        _buildModeTile = Tile.TileType.Empty;
+        _buildModeTile = TileType.Empty;
     }
 }

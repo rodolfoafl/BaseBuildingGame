@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile {
+public enum TileType { Empty, Floor };
 
-    public enum TileType { Empty, Floor };
+public class Tile {    
 
     TileType _type = TileType.Empty;
 
