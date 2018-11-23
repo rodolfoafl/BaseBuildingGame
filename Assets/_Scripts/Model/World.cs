@@ -9,6 +9,8 @@ public class World {
 
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
 
+    Action<InstalledObject> cbInstalledObjectCreated;
+
     int _width;
     int _height;
 
@@ -88,8 +90,38 @@ public class World {
         return _tiles[x, y];
     }
 
-    void PlaceInstalledObject(string buildModeObjectType, Tile t)
+    //Assumes 1x1 tiles.
+    public void PlaceInstalledObject(string objectType, Tile t)
     {
-        
+        InstalledObject instObj = _installedObjectPrototypes[objectType];
+        if (!_installedObjectPrototypes.TryGetValue(objectType, out instObj))
+        {
+            Debug.LogError("_installedObjectPrototypes doesn't contain the objectType!");
+            return;
+        }
+
+        InstalledObject obj = InstalledObject.PlaceInstance(instObj, t);
+        if(obj == null)
+        {
+            //Failed to place object. Most likely there was already something there.
+            return;
+        }
+
+        if(cbInstalledObjectCreated != null)
+        {
+            cbInstalledObjectCreated(obj);
+        }
     }
+
+    #region Callbacks
+    public void RegisterInstalledObjectCreated(Action<InstalledObject> callback)
+    {
+        cbInstalledObjectCreated += callback;
+    }
+
+    public void UnregisterInstalledObjectCreated(Action<InstalledObject> callback)
+    {
+        cbInstalledObjectCreated -= callback;
+    }
+    #endregion
 }

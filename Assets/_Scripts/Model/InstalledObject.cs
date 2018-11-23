@@ -1,14 +1,34 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class InstalledObject{
 
     Tile _tile;
+    Action<InstalledObject> cbOnInstalledObjectChanged;
     string _objectType;
     float _movementCost;
     int _width;
     int _height;
+
+    #region Properties
+    public string ObjectType
+    {
+        get
+        {
+            return _objectType;
+        }
+    }
+
+    public Tile Tile
+    {
+        get
+        {
+            return _tile;
+        }
+    }
+    #endregion
 
     protected InstalledObject()
     {
@@ -43,4 +63,16 @@ public class InstalledObject{
 
         return obj;
     }
+
+    #region Callbacks
+    public void RegisterOnInstalledObjectChangedCallback(Action<InstalledObject> callback)
+    {
+        cbOnInstalledObjectChanged += callback;
+    }
+
+    public void UnregisterOnInstalledObjectChangedCallback(Action<InstalledObject> callback)
+    {
+        cbOnInstalledObjectChanged -= callback;
+    }
+    #endregion
 }

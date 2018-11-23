@@ -7,8 +7,10 @@ public class WorldController : MonoBehaviour {
     static WorldController _instance;
 
     Dictionary<Tile, GameObject> _tileGameObjectMap;
+    Dictionary<InstalledObject, GameObject> _installedObjectGameObjectMap;
 
-    [SerializeField] Sprite floorSprite;
+    [SerializeField] Sprite _floorSprite;
+    [SerializeField] Sprite _wallSprite;
 
     World _world;
 
@@ -44,7 +46,10 @@ public class WorldController : MonoBehaviour {
     {
         _world = new World();
 
+        _world.RegisterInstalledObjectCreated(OnInstalledObjectCreated);
+
         _tileGameObjectMap = new Dictionary<Tile, GameObject>();
+        _installedObjectGameObjectMap = new Dictionary<InstalledObject, GameObject>();
 
         for (int x = 0; x < _world.Width; x++)
         {
@@ -93,7 +98,7 @@ public class WorldController : MonoBehaviour {
 
         if (tile_data.Type == TileType.Floor)
         {
-            tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
+            tile_go.GetComponent<SpriteRenderer>().sprite = _floorSprite;
         }
         else
         {
@@ -107,5 +112,26 @@ public class WorldController : MonoBehaviour {
         int y = Mathf.FloorToInt(coordinate.y);
 
         return Instance.World.GetTileAt(x, y);
+    }
+
+    public void OnInstalledObjectCreated(InstalledObject obj)
+    {
+        GameObject instObj = new GameObject();
+
+        _installedObjectGameObjectMap.Add(obj, instObj);
+
+        instObj.name = obj.ObjectType + "_" + obj.Tile.X + "_" + obj.Tile.Y;
+        instObj.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0);
+        instObj.transform.SetParent(this.transform, true);
+
+        instObj.AddComponent<SpriteRenderer>().sprite = _wallSprite;
+        instObj.GetComponent<SpriteRenderer>().sortingLayerName = "InstalledObjects";
+
+        obj.RegisterOnInstalledObjectChangedCallback(OnInstalledObjectChanged);
+    }
+
+    void OnInstalledObjectChanged(InstalledObject obj)
+    {
+        Debug.Log("OnInstalledObjectChanged -- NOT IMPLEMENTED!");
     }
 }

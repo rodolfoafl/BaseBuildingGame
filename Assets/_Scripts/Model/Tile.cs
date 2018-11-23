@@ -81,6 +81,7 @@ public class Tile {
         return true;
     }
 
+    #region Callbacks
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)
     {
         _cbTileTypeChanged += callback;
@@ -90,4 +91,5 @@ public class Tile {
     {
         _cbTileTypeChanged -= callback;
     }
+    #endregion
 }

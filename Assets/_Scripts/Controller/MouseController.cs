@@ -112,7 +112,7 @@ public class MouseController : MonoBehaviour {
                     {
                         if (_buildModeIsObject)
                         {
-                            //WorldController.Instance.World.PlaceInstalledObject(_buildModeObjectType, t);
+                            WorldController.Instance.World.PlaceInstalledObject(_buildModeObjectType, t);
                         }
                         else
                         {
