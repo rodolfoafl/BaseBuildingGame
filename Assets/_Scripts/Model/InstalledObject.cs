@@ -10,22 +10,37 @@ public class InstalledObject{
     int _width;
     int _height;
 
-    public InstalledObject(string objectType, float movementCost = 1f, int width = 1, int height = 1)
+    protected InstalledObject()
     {
-        this._objectType = objectType;
-        this._movementCost = movementCost;
-        this._width = width;
-        this._height = height;
+
     }
 
-    public InstalledObject(InstalledObject proto, Tile tile)
-    {      
-        this._objectType = proto._objectType;
-        this._movementCost = proto._movementCost;
-        this._width = proto._width;
-        this._height = proto._height;
+    public static InstalledObject CreatePrototype(string objectType, float movementCost = 1f, int width = 1, int height = 1)
+    {
+        InstalledObject obj = new InstalledObject();
+        obj._objectType = objectType;
+        obj._movementCost = movementCost;
+        obj._width = width;
+        obj._height = height;
 
-        this._tile = tile;
-        //tile.InstalledObject = this;
+        return obj;
+    }
+
+    public static InstalledObject PlaceInstance(InstalledObject proto, Tile tile)
+    {
+        InstalledObject obj = new InstalledObject();
+
+        obj._objectType = proto._objectType;
+        obj._movementCost = proto._movementCost;
+        obj._width = proto._width;
+        obj._height = proto._height;
+
+        obj._tile = tile;
+        if (!tile.AssignInstalledObject(obj))
+        {
+            return null;
+        }
+
+        return obj;
     }
 }

@@ -12,6 +12,7 @@ public class MouseController : MonoBehaviour {
 
     bool _buildModeIsObject = false;
     TileType _buildModeTile = TileType.Floor;
+    string _buildModeObjectType;
     Vector3 _lastFramePosition;
     Vector3 _currFramePosition;
     Vector3 _dragStartPosition;
@@ -111,7 +112,7 @@ public class MouseController : MonoBehaviour {
                     {
                         if (_buildModeIsObject)
                         {
-                            
+                            //WorldController.Instance.World.PlaceInstalledObject(_buildModeObjectType, t);
                         }
                         else
                         {
@@ -161,8 +162,9 @@ public class MouseController : MonoBehaviour {
         _buildModeTile = TileType.Empty;
     }
 
-    public void SetMode_BuildWall()
+    public void SetMode_BuildInstalledObject(string objectType)
     {
         _buildModeIsObject = true;
+        _buildModeObjectType = objectType;
     }
 }

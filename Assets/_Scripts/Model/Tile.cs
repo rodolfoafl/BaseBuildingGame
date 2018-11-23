@@ -63,6 +63,24 @@ public class Tile {
         this._y = y;
     }
 
+    public bool AssignInstalledObject(InstalledObject objInstance)
+    {
+        if(objInstance == null)
+        {
+            _installedObject = null;
+            return true;
+        }
+
+        if(_installedObject != null)
+        {
+            Debug.LogError("Trying to assign an installed object to a tile that already has one!");
+            return false;
+        }
+
+        _installedObject = objInstance;
+        return true;
+    }
+
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)
     {
         _cbTileTypeChanged += callback;
