@@ -8,9 +8,9 @@ public class WorldController : MonoBehaviour {
 
     Dictionary<Tile, GameObject> _tileGameObjectMap;
     Dictionary<InstalledObject, GameObject> _installedObjectGameObjectMap;
+    Dictionary<string, Sprite> _stringSpritesMap;
 
     [SerializeField] Sprite _floorSprite;
-    [SerializeField] Sprite _wallSprite;
 
     World _world;
 
@@ -44,6 +44,14 @@ public class WorldController : MonoBehaviour {
 
     void Start()
     {
+        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/Wall/");
+        _stringSpritesMap = new Dictionary<string, Sprite>();
+        
+        foreach(Sprite s in sprites)
+        {
+            _stringSpritesMap[s.name] = s;
+        }
+
         _world = new World();
 
         _world.RegisterInstalledObjectCreated(OnInstalledObjectCreated);
@@ -124,10 +132,58 @@ public class WorldController : MonoBehaviour {
         instObj.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0);
         instObj.transform.SetParent(this.transform, true);
 
-        instObj.AddComponent<SpriteRenderer>().sprite = _wallSprite;
+        instObj.AddComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
+;
         instObj.GetComponent<SpriteRenderer>().sortingLayerName = "InstalledObjects";
 
         obj.RegisterOnInstalledObjectChangedCallback(OnInstalledObjectChanged);
+    }
+
+    Sprite GetSpriteForInstalledObject(InstalledObject obj)
+    {
+        if (!obj.LinksToNeighbor)
+        {
+            return _stringSpritesMap[obj.ObjectType];
+        }
+
+        string spriteName = obj.ObjectType + "_";
+
+        int x = obj.Tile.X;
+        int y = obj.Tile.Y;
+
+        Tile t;
+        t = World.GetTileAt(x, y + 1);
+        if(t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType)) 
+        {
+            spriteName += "N";
+        }
+
+        t = World.GetTileAt(x + 1, y);
+        if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+        {
+            spriteName += "E";
+        }
+
+        t = World.GetTileAt(x, y - 1);
+        if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+        {
+            spriteName += "S";
+        }
+
+        t = World.GetTileAt(x - 1, y);
+        if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+        {
+            spriteName += "W";
+        }
+
+        Sprite sprite = _stringSpritesMap[spriteName];
+        if (!_stringSpritesMap.TryGetValue(spriteName, out sprite))
+        {
+            Debug.LogError("_stringSpritesMap doesn't contain the Sprite!");
+            return null;
+        }
+
+        return _stringSpritesMap[spriteName];
     }
 
     void OnInstalledObjectChanged(InstalledObject obj)

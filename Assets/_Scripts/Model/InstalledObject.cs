@@ -12,6 +12,8 @@ public class InstalledObject{
     int _width;
     int _height;
 
+    bool _linksToNeighbor = false;
+
     #region Properties
     public string ObjectType
     {
@@ -28,6 +30,14 @@ public class InstalledObject{
             return _tile;
         }
     }
+
+    public bool LinksToNeighbor
+    {
+        get
+        {
+            return _linksToNeighbor;
+        }
+    }
     #endregion
 
     protected InstalledObject()
@@ -35,13 +45,14 @@ public class InstalledObject{
 
     }
 
-    public static InstalledObject CreatePrototype(string objectType, float movementCost = 1f, int width = 1, int height = 1)
+    public static InstalledObject CreatePrototype(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbor = false)
     {
         InstalledObject obj = new InstalledObject();
         obj._objectType = objectType;
         obj._movementCost = movementCost;
         obj._width = width;
         obj._height = height;
+        obj._linksToNeighbor = linksToNeighbor;
 
         return obj;
     }
@@ -54,6 +65,7 @@ public class InstalledObject{
         obj._movementCost = proto._movementCost;
         obj._width = proto._width;
         obj._height = proto._height;
+        obj._linksToNeighbor = proto._linksToNeighbor;
 
         obj._tile = tile;
         if (!tile.AssignInstalledObject(obj))

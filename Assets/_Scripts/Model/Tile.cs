@@ -54,6 +54,14 @@ public class Tile {
             return _y;
         }
     }
+
+    public InstalledObject InstalledObject
+    {
+        get
+        {
+            return _installedObject;
+        }
+    }
     #endregion
 
     public Tile( World world, int x, int y)

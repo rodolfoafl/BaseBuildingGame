@@ -56,7 +56,7 @@ public class World {
     {
         _installedObjectPrototypes = new Dictionary<string, InstalledObject>();
 
-        InstalledObject wallPrototype = InstalledObject.CreatePrototype("Wall", 0, 1, 1);
+        InstalledObject wallPrototype = InstalledObject.CreatePrototype("Wall", 0, 1, 1, true);
 
         _installedObjectPrototypes.Add("Wall", wallPrototype);
     }
