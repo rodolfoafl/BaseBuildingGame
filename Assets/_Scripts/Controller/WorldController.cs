@@ -44,13 +44,7 @@ public class WorldController : MonoBehaviour {
 
     void Start()
     {
-        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/Wall/");
-        _stringSpritesMap = new Dictionary<string, Sprite>();
-        
-        foreach(Sprite s in sprites)
-        {
-            _stringSpritesMap[s.name] = s;
-        }
+        LoadSprites();
 
         _world = new World();
 
@@ -80,6 +74,17 @@ public class WorldController : MonoBehaviour {
         }
 
         _world.RandomizeTiles();
+    }
+
+    void LoadSprites()
+    {
+        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/Wall/");
+        _stringSpritesMap = new Dictionary<string, Sprite>();
+
+        foreach (Sprite s in sprites)
+        {
+            _stringSpritesMap[s.name] = s;
+        }
     }
 
     //Old version, used by lambda
@@ -188,6 +193,12 @@ public class WorldController : MonoBehaviour {
 
     void OnInstalledObjectChanged(InstalledObject obj)
     {
-        Debug.Log("OnInstalledObjectChanged -- NOT IMPLEMENTED!");
+        GameObject inst_go = _installedObjectGameObjectMap[obj];
+        if (!_installedObjectGameObjectMap.TryGetValue(obj, out inst_go))
+        {
+            Debug.LogError("_installedObjectGameObjectMap doesn't contain the installed object!");
+            return;
+        }
+        inst_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
     }
 }

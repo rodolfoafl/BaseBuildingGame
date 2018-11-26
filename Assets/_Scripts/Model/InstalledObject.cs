@@ -73,6 +73,37 @@ public class InstalledObject{
             return null;
         }
 
+        if (obj.LinksToNeighbor)
+        {
+            Tile t;
+            int x = tile.X;
+            int y = tile.Y;
+
+            t = tile.World.GetTileAt(x, y + 1);
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            {
+                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+            }
+
+            t = tile.World.GetTileAt(x + 1, y);
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            {
+                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+            }
+
+            t = tile.World.GetTileAt(x, y - 1);
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            {
+                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+            }
+
+            t = tile.World.GetTileAt(x - 1, y);
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            {
+                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+            }
+        }
+
         return obj;
     }
 
