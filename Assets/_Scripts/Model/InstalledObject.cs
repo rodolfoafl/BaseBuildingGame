@@ -14,6 +14,8 @@ public class InstalledObject{
 
     bool _linksToNeighbor = false;
 
+    Func <Tile, bool> funcPositionValidation;
+
     #region Properties
     public string ObjectType
     {
@@ -54,11 +56,19 @@ public class InstalledObject{
         obj._height = height;
         obj._linksToNeighbor = linksToNeighbor;
 
+        obj.funcPositionValidation = obj.IsValidPosition;
+
         return obj;
     }
 
     public static InstalledObject PlaceInstance(InstalledObject proto, Tile tile)
     {
+        if(!proto.funcPositionValidation(tile))
+        {
+            Debug.LogError("PlaceInstance -- Position Validity Function returned FALSE!");
+            return null;
+        }
+
         InstalledObject obj = new InstalledObject();
 
         obj._objectType = proto._objectType;
@@ -105,6 +115,21 @@ public class InstalledObject{
         }
 
         return obj;
+    }
+
+    public bool IsValidPosition(Tile tile)
+    {
+        if(tile.Type != TileType.Floor)
+        {
+            return false;
+        }
+
+        if(tile.InstalledObject != null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     #region Callbacks

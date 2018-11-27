@@ -11,6 +11,7 @@ public class WorldController : MonoBehaviour {
     Dictionary<string, Sprite> _stringSpritesMap;
 
     [SerializeField] Sprite _floorSprite;
+    [SerializeField] Sprite _emptySprite;
 
     World _world;
 
@@ -66,14 +67,16 @@ public class WorldController : MonoBehaviour {
                 tile_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
                 tile_go.transform.SetParent(this.transform, true);
 
-                tile_go.AddComponent<SpriteRenderer>();
+                tile_go.AddComponent<SpriteRenderer>().sprite = _emptySprite;
 
                 //tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); });
                 tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
 
-        _world.RandomizeTiles();
+        Camera.main.transform.position = new Vector3(_world.Width / 2, _world.Height / 2, Camera.main.transform.position.z);
+
+        //_world.RandomizeTiles();
     }
 
     void LoadSprites()
