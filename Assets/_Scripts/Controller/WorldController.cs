@@ -43,7 +43,7 @@ public class WorldController : MonoBehaviour {
         }
     }
 
-    void Start()
+    void Awake()
     {
         LoadSprites();
 
@@ -70,9 +70,11 @@ public class WorldController : MonoBehaviour {
                 tile_go.AddComponent<SpriteRenderer>().sprite = _emptySprite;
 
                 //tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); });
-                tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
+                //tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
+
+        _world.RegisterTileChanged(OnTileChanged);
 
         Camera.main.transform.position = new Vector3(_world.Width / 2, _world.Height / 2, Camera.main.transform.position.z);
 
@@ -103,7 +105,7 @@ public class WorldController : MonoBehaviour {
         }
     }*/
 
-    void OnTileTypeChanged(Tile tile_data)
+    void OnTileChanged(Tile tile_data)
     {
         GameObject tile_go = _tileGameObjectMap[tile_data];
         if (!_tileGameObjectMap.TryGetValue(tile_data, out tile_go))

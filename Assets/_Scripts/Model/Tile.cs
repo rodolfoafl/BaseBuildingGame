@@ -9,7 +9,7 @@ public class Tile {
 
     TileType _type = TileType.Empty;
 
-    Action<Tile> _cbTileTypeChanged;
+    Action<Tile> _cbTileChanged;
 
     LooseObject _looseObject;
     InstalledObject _installedObject;
@@ -31,9 +31,9 @@ public class Tile {
             if (Type != value)
             {
                 _type = value;
-                if (_cbTileTypeChanged != null)
+                if (_cbTileChanged != null)
                 {
-                    _cbTileTypeChanged(this);
+                    _cbTileChanged(this);
                 }
             }
         }
@@ -100,12 +100,12 @@ public class Tile {
     #region Callbacks
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)
     {
-        _cbTileTypeChanged += callback;
+        _cbTileChanged += callback;
     }
 
     public void UnregisterTileTypeChangedCallback(Action<Tile> callback)
     {
-        _cbTileTypeChanged -= callback;
+        _cbTileChanged -= callback;
     }
     #endregion
 }

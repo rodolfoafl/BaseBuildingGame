@@ -10,6 +10,7 @@ public class World {
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
 
     Action<InstalledObject> cbInstalledObjectCreated;
+    Action<Tile> cbTileChanged;
 
     int _width;
     int _height;
@@ -44,6 +45,7 @@ public class World {
             for (int y = 0; y < height; y++)
             {
                 _tiles[x, y] = new Tile(this, x, y);
+                _tiles[x, y].RegisterTileTypeChangedCallback(OnTileChanged);
             }
         }
 
@@ -123,5 +125,24 @@ public class World {
     {
         cbInstalledObjectCreated -= callback;
     }
+
+    public void RegisterTileChanged(Action<Tile> callback)
+    {
+        cbTileChanged += callback;
+    }
+
+    public void UnregisterTileChanged(Action<Tile> callback)
+    {
+        cbTileChanged -= callback;
+    }
     #endregion
+
+    void OnTileChanged(Tile t)
+    {
+        if (cbTileChanged == null)
+        {
+            return;
+        }
+        cbTileChanged(t);
+    }
 }
