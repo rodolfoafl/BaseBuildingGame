@@ -12,9 +12,13 @@ public class Tile {
     Action<Tile> _cbTileChanged;
 
     LooseObject _looseObject;
+
     InstalledObject _installedObject;
 
+    Job _pendingInstalledObjectJob;
+
     World _world;
+
     int _x;
     int _y;
 
@@ -68,6 +72,19 @@ public class Tile {
         get
         {
             return _world;
+        }
+    }
+
+    public Job PendingInstalledObjectJob
+    {
+        get
+        {
+            return _pendingInstalledObjectJob;
+        }
+
+        set
+        {
+            _pendingInstalledObjectJob = value;
         }
     }
     #endregion

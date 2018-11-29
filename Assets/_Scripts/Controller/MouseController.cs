@@ -6,16 +6,22 @@ using UnityEngine.EventSystems;
 public class MouseController : MonoBehaviour {
 
     [SerializeField] Transform _cursorGameObjectsContainer;
+
     [SerializeField] GameObject _circleCursorPrefab;
+
     [SerializeField] float _mouseZoomInMax;
     [SerializeField] float _mouseZoomOutMax;
 
     bool _buildModeIsObject = false;
+
     TileType _buildModeTile = TileType.Floor;
+
     string _buildModeObjectType;
+
     Vector3 _lastFramePosition;
     Vector3 _currFramePosition;
     Vector3 _dragStartPosition;
+
     List<GameObject> _dragPreviewGameObjects;
 
     void Start()
@@ -23,7 +29,6 @@ public class MouseController : MonoBehaviour {
         _dragPreviewGameObjects = new List<GameObject>();
     }
 	
-	// Update is called once per frame
 	void LateUpdate ()
     {
         _currFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -37,6 +42,7 @@ public class MouseController : MonoBehaviour {
         _lastFramePosition.z = 0;
     }
 
+    #region Mouse Related Methods
     void UpdateDragging()
     {
         if (EventSystem.current.IsPointerOverGameObject())
@@ -106,17 +112,30 @@ public class MouseController : MonoBehaviour {
             {
                 for (int y = start_y; y <= end_y; y++)
                 {
-                    Tile t = WorldController.Instance.World.GetTileAt(x, y);
+                    Tile tile = WorldController.Instance.World.GetTileAt(x, y);
 
-                    if (t != null)
+                    if (tile != null)
                     {
                         if (_buildModeIsObject)
                         {
-                            WorldController.Instance.World.PlaceInstalledObject(_buildModeObjectType, t);
+                            string installedObjectType = _buildModeObjectType;
+                            if (WorldController.Instance.World.IsInstalledObjectPlacementValid(installedObjectType, tile) 
+                                && tile.PendingInstalledObjectJob == null)
+                            {
+                                Job newJob = new Job(tile, (theJob) => { OnInstalledObjectJobCompleted(installedObjectType, theJob.Tile);
+                                    tile.PendingInstalledObjectJob = null;
+                                });
+
+                                tile.PendingInstalledObjectJob = newJob;
+                                newJob.RegisterJobCancelledCallback((theJob) => { theJob.Tile.PendingInstalledObjectJob = null; });
+
+                                WorldController.Instance.World.JobQueue.Enqueue(newJob);
+                                Debug.Log("JobQueue size: " + WorldController.Instance.World.JobQueue.Count);
+                            }
                         }
                         else
                         {
-                            t.Type = _buildModeTile;
+                            tile.Type = _buildModeTile;
                         }
                     }
                 }
@@ -134,6 +153,7 @@ public class MouseController : MonoBehaviour {
 
         Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize -= Input.mouseScrollDelta.y, _mouseZoomInMax, _mouseZoomOutMax);
     }
+    #endregion
 
     /*void UpdateCursor()
     {
@@ -150,6 +170,7 @@ public class MouseController : MonoBehaviour {
         }
     }*/
 
+    #region UI Related Methods
     public void SetMode_BuildFloor()
     {
         _buildModeIsObject = false;
@@ -166,5 +187,11 @@ public class MouseController : MonoBehaviour {
     {
         _buildModeIsObject = true;
         _buildModeObjectType = objectType;
+    }
+    #endregion
+
+    void OnInstalledObjectJobCompleted(string objectType, Tile tile)
+    {
+        WorldController.Instance.World.PlaceInstalledObject(_buildModeObjectType, tile);
     }
 }

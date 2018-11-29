@@ -9,8 +9,10 @@ public class World {
 
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
 
-    Action<InstalledObject> cbInstalledObjectCreated;
-    Action<Tile> cbTileChanged;
+    Action<InstalledObject> _cbInstalledObjectCreated;
+    Action<Tile> _cbTileChanged;
+
+    Queue<Job> _jobQueue;
 
     int _width;
     int _height;
@@ -31,6 +33,19 @@ public class World {
             return _height;
         }
     }
+
+    public Queue<Job> JobQueue
+    {
+        get
+        {
+            return _jobQueue;
+        }
+
+        set
+        {
+            _jobQueue = value;
+        }
+    }
     #endregion
 
     public World(int width = 100, int height = 100)
@@ -39,6 +54,8 @@ public class World {
         this._height = height;
 
         _tiles = new Tile[width, height];
+
+        _jobQueue = new Queue<Job>();
 
         for (int x = 0; x < width; x++)
         {
@@ -93,7 +110,7 @@ public class World {
     }
 
     //Assumes 1x1 tiles.
-    public void PlaceInstalledObject(string objectType, Tile t)
+    public void PlaceInstalledObject(string objectType, Tile tile)
     {
         InstalledObject instObj = _installedObjectPrototypes[objectType];
         if (!_installedObjectPrototypes.TryGetValue(objectType, out instObj))
@@ -102,47 +119,54 @@ public class World {
             return;
         }
 
-        InstalledObject obj = InstalledObject.PlaceInstance(instObj, t);
+        InstalledObject obj = InstalledObject.PlaceInstance(instObj, tile);
         if(obj == null)
         {
             //Failed to place object. Most likely there was already something there.
             return;
         }
 
-        if(cbInstalledObjectCreated != null)
+        if(_cbInstalledObjectCreated != null)
         {
-            cbInstalledObjectCreated(obj);
+            _cbInstalledObjectCreated(obj);
         }
+    }
+
+    void OnTileChanged(Tile t)
+    {
+        if (_cbTileChanged == null)
+        {
+            return;
+        }
+        _cbTileChanged(t);
+    }
+
+    public bool IsInstalledObjectPlacementValid(string installedObjectType, Tile tile)
+    {
+        return _installedObjectPrototypes[installedObjectType].IsValidPosition(tile);
     }
 
     #region Callbacks
     public void RegisterInstalledObjectCreated(Action<InstalledObject> callback)
     {
-        cbInstalledObjectCreated += callback;
+        _cbInstalledObjectCreated += callback;
     }
 
     public void UnregisterInstalledObjectCreated(Action<InstalledObject> callback)
     {
-        cbInstalledObjectCreated -= callback;
+        _cbInstalledObjectCreated -= callback;
     }
 
     public void RegisterTileChanged(Action<Tile> callback)
     {
-        cbTileChanged += callback;
+        _cbTileChanged += callback;
     }
 
     public void UnregisterTileChanged(Action<Tile> callback)
     {
-        cbTileChanged -= callback;
+        _cbTileChanged -= callback;
     }
     #endregion
 
-    void OnTileChanged(Tile t)
-    {
-        if (cbTileChanged == null)
-        {
-            return;
-        }
-        cbTileChanged(t);
-    }
+   
 }

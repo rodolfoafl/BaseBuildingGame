@@ -6,9 +6,13 @@ using UnityEngine;
 public class InstalledObject{
 
     Tile _tile;
-    Action<InstalledObject> cbOnInstalledObjectChanged;
+
+    Action<InstalledObject> _cbOnInstalledObjectChanged;
+
     string _objectType;
+
     float _movementCost;
+
     int _width;
     int _height;
 
@@ -56,7 +60,7 @@ public class InstalledObject{
         obj._height = height;
         obj._linksToNeighbor = linksToNeighbor;
 
-        obj.funcPositionValidation = obj.IsValidPosition;
+        obj.funcPositionValidation = obj._IsValidPosition;
 
         return obj;
     }
@@ -92,25 +96,25 @@ public class InstalledObject{
             t = tile.World.GetTileAt(x, y + 1);
             if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
             {
-                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+                t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
 
             t = tile.World.GetTileAt(x + 1, y);
             if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
             {
-                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+                t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
 
             t = tile.World.GetTileAt(x, y - 1);
             if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
             {
-                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+                t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
 
             t = tile.World.GetTileAt(x - 1, y);
             if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
             {
-                t.InstalledObject.cbOnInstalledObjectChanged(t.InstalledObject);
+                t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
         }
 
@@ -118,6 +122,11 @@ public class InstalledObject{
     }
 
     public bool IsValidPosition(Tile tile)
+    {
+        return funcPositionValidation(tile);
+    }
+
+    public bool _IsValidPosition(Tile tile)
     {
         if(tile.Type != TileType.Floor)
         {
@@ -135,12 +144,12 @@ public class InstalledObject{
     #region Callbacks
     public void RegisterOnInstalledObjectChangedCallback(Action<InstalledObject> callback)
     {
-        cbOnInstalledObjectChanged += callback;
+        _cbOnInstalledObjectChanged += callback;
     }
 
     public void UnregisterOnInstalledObjectChangedCallback(Action<InstalledObject> callback)
     {
-        cbOnInstalledObjectChanged -= callback;
+        _cbOnInstalledObjectChanged -= callback;
     }
     #endregion
 }
