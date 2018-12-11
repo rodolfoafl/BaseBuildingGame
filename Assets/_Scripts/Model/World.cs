@@ -12,7 +12,7 @@ public class World {
     Action<InstalledObject> _cbInstalledObjectCreated;
     Action<Tile> _cbTileChanged;
 
-    Queue<Job> _jobQueue;
+    JobQueue _jobQueue;
 
     int _width;
     int _height;
@@ -34,7 +34,7 @@ public class World {
         }
     }
 
-    public Queue<Job> JobQueue
+    public JobQueue JobQueue
     {
         get
         {
@@ -55,7 +55,7 @@ public class World {
 
         _tiles = new Tile[width, height];
 
-        _jobQueue = new Queue<Job>();
+        _jobQueue = new JobQueue();
 
         for (int x = 0; x < width; x++)
         {
@@ -112,7 +112,7 @@ public class World {
     //Assumes 1x1 tiles.
     public void PlaceInstalledObject(string objectType, Tile tile)
     {
-        InstalledObject instObj = _installedObjectPrototypes[objectType];
+        InstalledObject instObj;
         if (!_installedObjectPrototypes.TryGetValue(objectType, out instObj))
         {
             Debug.LogError("_installedObjectPrototypes doesn't contain the objectType!");
@@ -144,6 +144,18 @@ public class World {
     public bool IsInstalledObjectPlacementValid(string installedObjectType, Tile tile)
     {
         return _installedObjectPrototypes[installedObjectType].IsValidPosition(tile);
+    }
+
+
+    public InstalledObject GetInstalledObjectPrototype(string objectType)
+    {
+        InstalledObject instObj;
+        if (!_installedObjectPrototypes.TryGetValue(objectType, out instObj))
+        {
+            Debug.LogError("_installedObjectPrototypes doesn't contain the objectType!");
+            return null;
+        }
+        return _installedObjectPrototypes[objectType];
     }
 
     #region Callbacks

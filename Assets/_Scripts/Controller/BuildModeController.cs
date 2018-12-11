@@ -37,7 +37,7 @@ public class BuildModeController : MonoBehaviour {
             if (WorldController.Instance.World.IsInstalledObjectPlacementValid(installedObjectType, tile)
                 && tile.PendingInstalledObjectJob == null)
             {
-                Job newJob = new Job(tile, (theJob) => {
+                Job newJob = new Job(tile, installedObjectType, (theJob) => {
                     OnInstalledObjectJobCompleted(installedObjectType, theJob.Tile);
                     tile.PendingInstalledObjectJob = null;
                 });
@@ -46,7 +46,7 @@ public class BuildModeController : MonoBehaviour {
                 newJob.RegisterJobCancelledCallback((theJob) => { theJob.Tile.PendingInstalledObjectJob = null; });
 
                 WorldController.Instance.World.JobQueue.Enqueue(newJob);
-                Debug.Log("JobQueue size: " + WorldController.Instance.World.JobQueue.Count);
+                //Debug.Log("JobQueue size: " + WorldController.Instance.World.JobQueue.Count);
             }
         }
         else

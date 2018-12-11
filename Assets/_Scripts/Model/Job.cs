@@ -9,6 +9,8 @@ public class Job {
 
     float _jobTile;
 
+    string _jobObjectType; 
+
     Action<Job> _cbJobCompleted;
     Action<Job> _cbJobCancelled;
 
@@ -20,11 +22,25 @@ public class Job {
             return _tile;
         }
     }
+
+    public string JobObjectType
+    {
+        get
+        {
+            return _jobObjectType;
+        }
+
+        set
+        {
+            _jobObjectType = value;
+        }
+    }
     #endregion
 
-    public Job(Tile tile, Action<Job> cbJobCompleted, float jobTime = 1f)
+    public Job(Tile tile, string jobObjectType, Action<Job> cbJobCompleted, float jobTime = 1f)
     {
         this._tile = tile;
+        this._jobObjectType = jobObjectType;
         this._cbJobCompleted += cbJobCompleted;
     }
 
@@ -57,6 +73,16 @@ public class Job {
     public void RegisterJobCancelledCallback(Action<Job> callback)
     {
         _cbJobCancelled += callback;
+    }
+
+    public void UnregisterJobCompletedCallback(Action<Job> callback)
+    {
+        _cbJobCompleted -= callback;
+    }
+
+    public void UnregisterJobCancelledCallback(Action<Job> callback)
+    {
+        _cbJobCancelled -= callback;
     }
     #endregion
 }

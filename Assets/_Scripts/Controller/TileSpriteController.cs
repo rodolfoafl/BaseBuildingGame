@@ -42,7 +42,7 @@ public class TileSpriteController : MonoBehaviour {
 
     void OnTileChanged(Tile tile_data)
     {
-        GameObject tile_go = _tileGameObjectMap[tile_data];
+        GameObject tile_go;
         if (!_tileGameObjectMap.TryGetValue(tile_data, out tile_go))
         {
             Debug.LogError("_tileGameObjectMap doesn't contain the tile_data!");

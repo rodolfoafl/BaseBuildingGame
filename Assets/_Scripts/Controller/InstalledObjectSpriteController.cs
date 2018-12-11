@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FurnitureSpriteController : MonoBehaviour {
+public class InstalledObjectSpriteController : MonoBehaviour {
 
     Dictionary<InstalledObject, GameObject> _installedObjectGameObjectMap;
     Dictionary<string, Sprite> _stringSpritesMap;
@@ -48,7 +48,7 @@ public class FurnitureSpriteController : MonoBehaviour {
         obj.RegisterOnInstalledObjectChangedCallback(OnInstalledObjectChanged);
     }
 
-    Sprite GetSpriteForInstalledObject(InstalledObject obj)
+    public Sprite GetSpriteForInstalledObject(InstalledObject obj)
     {
         if (!obj.LinksToNeighbor)
         {
@@ -85,7 +85,7 @@ public class FurnitureSpriteController : MonoBehaviour {
             spriteName += "W";
         }
 
-        Sprite sprite = _stringSpritesMap[spriteName];
+        Sprite sprite;
         if (!_stringSpritesMap.TryGetValue(spriteName, out sprite))
         {
             Debug.LogError("_stringSpritesMap doesn't contain the Sprite!");
@@ -95,9 +95,46 @@ public class FurnitureSpriteController : MonoBehaviour {
         return _stringSpritesMap[spriteName];
     }
 
+    public Sprite GetSpriteForInstalledObject(string objectType)
+    {
+        Sprite sprite;
+        if (!_stringSpritesMap.TryGetValue(objectType, out sprite))
+        {
+            //Walls
+            if (!_stringSpritesMap.TryGetValue(objectType + "_", out sprite))
+            {
+                Debug.LogError("_stringSpritesMap doesn't contain the Sprite for: " + objectType);
+                return null;
+            }
+            else
+            {
+                return _stringSpritesMap[objectType + "_"];
+            }
+        }
+        else
+        {
+            return _stringSpritesMap[objectType];
+        }
+
+        /*
+        if (_stringSpritesMap.ContainsKey(objectType))
+        {
+            return _stringSpritesMap[objectType];
+        }
+
+        if (_stringSpritesMap.ContainsKey(objectType + "_"))
+        {
+            return _stringSpritesMap[objectType + "_"];
+        }
+
+        Debug.LogError("_stringSpritesMap doesn't contain the Sprite for: " + objectType);
+        return null;
+        */
+    }
+
     void OnInstalledObjectChanged(InstalledObject obj)
     {
-        GameObject inst_go = _installedObjectGameObjectMap[obj];
+        GameObject inst_go;
         if (!_installedObjectGameObjectMap.TryGetValue(obj, out inst_go))
         {
             Debug.LogError("_installedObjectGameObjectMap doesn't contain the installed object!");
