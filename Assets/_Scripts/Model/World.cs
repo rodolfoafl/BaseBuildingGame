@@ -6,10 +6,12 @@ using UnityEngine;
 public class World {
 
     Tile[,] _tiles;
+    List<Character> _characters;
 
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
 
     Action<InstalledObject> _cbInstalledObjectCreated;
+    Action<Character> _cbCharacterCreated;
     Action<Tile> _cbTileChanged;
 
     JobQueue _jobQueue;
@@ -69,6 +71,17 @@ public class World {
         Debug.Log("World created with " + (width * height) + " tiles.");
 
         InitializeInstalledObjectPrototypesDictionary();
+
+        _characters = new List<Character>();
+    }
+
+    public void CreateCharacter(Tile tile)
+    {
+        Character newCharacter = new Character(tile);
+        if (_cbCharacterCreated != null)
+        {
+            _cbCharacterCreated(newCharacter);
+        }
     }
 
     void InitializeInstalledObjectPrototypesDictionary()
@@ -146,7 +159,6 @@ public class World {
         return _installedObjectPrototypes[installedObjectType].IsValidPosition(tile);
     }
 
-
     public InstalledObject GetInstalledObjectPrototype(string objectType)
     {
         InstalledObject instObj;
@@ -178,7 +190,17 @@ public class World {
     {
         _cbTileChanged -= callback;
     }
+
+    public void RegisterCharacterCreated(Action<Character> callback)
+    {
+        _cbCharacterCreated += callback;
+    }
+
+    public void UnregisterCharacterCreated(Action<Character> callback)
+    {
+        _cbCharacterCreated -= callback;
+    }
     #endregion
 
-   
+
 }

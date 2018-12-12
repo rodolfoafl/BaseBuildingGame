@@ -114,6 +114,34 @@ public class Tile {
         return true;
     }
 
+    public bool IsNeighbour(Tile tile, bool diagonalOk = false)
+    {
+        if(this.X == tile.X && (this.Y == tile.Y + 1 || this.Y == tile.Y - 1))
+        {
+            return true;
+        }
+
+        if (this.Y == tile.Y && (this.X == tile.X + 1 || this.X == tile.X - 1))
+        {
+            return true;
+        }
+
+        if (diagonalOk)
+        {
+            if (this.X == tile.X + 1 && (this.Y == tile.Y + 1 || this.Y == tile.Y - 1))
+            {
+                return true;
+            }
+
+            if (this.X == tile.X - 1 && (this.Y == tile.Y + 1 || this.Y == tile.Y - 1))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     #region Callbacks
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)
     {

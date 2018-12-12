@@ -22,7 +22,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
     void LoadSprites()
     {
-        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/Wall/");
+        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/NewSprites/Walls/");
         _stringSpritesMap = new Dictionary<string, Sprite>();
 
         foreach (Sprite s in sprites)
@@ -42,7 +42,6 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         instObj.transform.SetParent(this.transform, true);
 
         instObj.AddComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
-;
         instObj.GetComponent<SpriteRenderer>().sortingLayerName = "InstalledObjects";
 
         obj.RegisterOnInstalledObjectChangedCallback(OnInstalledObjectChanged);
