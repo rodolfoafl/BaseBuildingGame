@@ -19,7 +19,8 @@ public class CharacterSpriteController : MonoBehaviour {
 
         _world.RegisterCharacterCreated(OnCharacterCreated);
 
-        _world.CreateCharacter(_world.GetTileAt(_world.Width / 2, _world.Height / 2));
+        Character newCharacter = _world.CreateCharacter(_world.GetTileAt(_world.Width / 2, _world.Height / 2));
+        //newCharacter.SetDestination(_world.GetTileAt(_world.Width / 2 + 5, _world.Height / 2));
     }
 
     void LoadSprites()
@@ -40,11 +41,24 @@ public class CharacterSpriteController : MonoBehaviour {
         _characterGameObjectMap.Add(character, char_go);
 
         char_go.name = "Character";
-        char_go.transform.position = new Vector3(character.CurrentTile.X, character.CurrentTile.Y, 0);
+        char_go.transform.position = new Vector3(character.X, character.Y, 0);
         char_go.transform.SetParent(this.transform, true);
 
         SpriteRenderer sr = char_go.AddComponent<SpriteRenderer>();
         sr.sprite = _stringCharacterSpritesMap["Character"];
         sr.sortingLayerName = "Characters";
+
+        character.RegisterCharacterMovedCallback(OnCharacterMoved);
+    }
+
+    void OnCharacterMoved(Character character)
+    {
+        GameObject character_go;
+        if (!_characterGameObjectMap.TryGetValue(character, out character_go))
+        {
+            Debug.LogError("_characterGameObjectMap doesn't contain the character!");
+            return;
+        }
+        character_go.transform.position = new Vector3(character.X, character.Y, 0f);
     }
 }

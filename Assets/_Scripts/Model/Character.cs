@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,10 @@ public class Character {
 
     Tile _currentTile;
     Tile _destinationTile;
+
+    Action<Character> _cbCharacterMoved;
+
+    Job _myJob;
 
     #region Properties
     public float X
@@ -45,9 +50,26 @@ public class Character {
 
     public void Update(float deltaTime)
     {
+        if(_myJob == null)
+        {        
+            _myJob = _currentTile.World.JobQueue.Dequeue();
+
+            if(_myJob != null)
+            {
+                _destinationTile = _myJob.Tile;
+                _myJob.RegisterJobCompletedCallback(RegisterOnJobEnded);
+                _myJob.RegisterJobCancelledCallback(RegisterOnJobEnded);
+            }
+        }
+
         //Reached destination yet?
         if(_currentTile == _destinationTile)
         {
+            if(_myJob != null)
+            {
+                _myJob.WorkOnJob(deltaTime);
+            }
+
             return;
         }
 
@@ -68,6 +90,11 @@ public class Character {
             _currentTile = _destinationTile;
             _movementPercentage = 0f;
         }
+
+        if(_cbCharacterMoved != null)
+        {
+            _cbCharacterMoved(this);
+        }
     }
 
     public void SetDestination(Tile tile)
@@ -79,4 +106,26 @@ public class Character {
 
         _destinationTile = tile;
     }
+
+    #region Callbacks
+    public void RegisterCharacterMovedCallback(Action<Character> callback)
+    {
+        _cbCharacterMoved += callback;
+    }
+
+    public void UnregisterCharacterMovedCallback(Action<Character> callback)
+    {
+        _cbCharacterMoved -= callback;
+    }
+
+    void RegisterOnJobEnded(Job job)
+    {
+        if(job != _myJob)
+        {
+            Debug.LogError("Character being told about job that isn't his!");
+            return;
+        }
+        _myJob = null;
+    }
+    #endregion
 }

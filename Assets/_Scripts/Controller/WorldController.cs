@@ -43,6 +43,11 @@ public class WorldController : MonoBehaviour {
         Camera.main.transform.position = new Vector3(_world.Width / 2, _world.Height / 2, Camera.main.transform.position.z);
     }
 
+    void Update()
+    {
+        World.Update(Time.deltaTime);
+    }
+
     public Tile GetTileAtWorldCoordinate(Vector3 coordinate)
     {
         int x = Mathf.FloorToInt(coordinate.x);

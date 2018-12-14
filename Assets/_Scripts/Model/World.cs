@@ -75,13 +75,24 @@ public class World {
         _characters = new List<Character>();
     }
 
-    public void CreateCharacter(Tile tile)
+    public void Update(float deltaTime)
+    {
+        foreach(Character c in _characters)
+        {
+            c.Update(deltaTime);
+        }
+    }
+
+    public Character CreateCharacter(Tile tile)
     {
         Character newCharacter = new Character(tile);
+        _characters.Add(newCharacter);
         if (_cbCharacterCreated != null)
         {
             _cbCharacterCreated(newCharacter);
         }
+
+        return newCharacter;
     }
 
     void InitializeInstalledObjectPrototypesDictionary()

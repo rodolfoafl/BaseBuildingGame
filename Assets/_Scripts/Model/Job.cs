@@ -44,7 +44,7 @@ public class Job {
         this._cbJobCompleted += cbJobCompleted;
     }
 
-    public void CompleteJob(float workTime)
+    public void WorkOnJob(float workTime)
     {
         _jobTile -= workTime;
         if (_jobTile <= 0)

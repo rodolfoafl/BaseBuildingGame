@@ -23,6 +23,18 @@ public class JobQueue {
         }
     }
 
+    public Job Dequeue()
+    {
+        if (_jobQueue.Count > 0)
+        {
+            return _jobQueue.Dequeue();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public void RegisterJobCreationCallback(Action<Job> callback)
     {
         _cbJobCreated += callback;
