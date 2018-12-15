@@ -27,6 +27,11 @@ public class BuildModeController : MonoBehaviour {
         _buildModeIsObject = true;
         _buildModeObjectType = objectType;
     }
+
+    public void SetupPathfinding()
+    {
+        WorldController.Instance.World.SetupPathfindingExample();
+    }
     #endregion
 
     public void Build(Tile tile)

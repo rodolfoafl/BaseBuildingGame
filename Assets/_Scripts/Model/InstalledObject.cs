@@ -44,6 +44,14 @@ public class InstalledObject{
             return _linksToNeighbor;
         }
     }
+
+    public float MovementCost
+    {
+        get
+        {
+            return _movementCost;
+        }
+    }
     #endregion
 
     protected InstalledObject()

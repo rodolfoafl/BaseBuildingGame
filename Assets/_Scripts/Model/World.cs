@@ -181,6 +181,28 @@ public class World {
         return _installedObjectPrototypes[objectType];
     }
 
+    public void SetupPathfindingExample()
+    {
+        int l = Width / 2 - 5;
+        int b = Height / 2 - 5;
+
+        for (int x = l - 5; x < l + 15; x++)
+        {
+            for (int y = b - 5; y < b + 15; y++)
+            {
+                _tiles[x, y].Type = TileType.Floor;
+
+                if(x == l || x == (l + 9) || y == b || y == (b + 9))
+                {
+                    if(x != (l + 9) && y != (b + 4))
+                    {
+                        PlaceInstalledObject("Wall", _tiles[x, y]);
+                    }
+                }
+            }
+        }
+    }
+
     #region Callbacks
     public void RegisterInstalledObjectCreated(Action<InstalledObject> callback)
     {

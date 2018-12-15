@@ -87,6 +87,22 @@ public class Tile {
             _pendingInstalledObjectJob = value;
         }
     }
+
+    public float MovementCost
+    {
+        get
+        {
+            if(Type == TileType.Empty)
+            {
+                return 0;
+            }
+            if(InstalledObject == null)
+            {
+                return 1;
+            }
+            return 1 * InstalledObject.MovementCost;
+        }
+    }
     #endregion
 
     public Tile( World world, int x, int y)

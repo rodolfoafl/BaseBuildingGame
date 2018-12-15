@@ -53,8 +53,13 @@ public class TileSpriteController : MonoBehaviour {
         {
             tile_go.GetComponent<SpriteRenderer>().sprite = _floorSprite;
         }
+        else if (tile_data.Type == TileType.Empty)
+        {
+            tile_go.GetComponent<SpriteRenderer>().sprite = _emptySprite;
+        }
         else
         {
+            Debug.LogError("OnTileTypeChanged - Unrecongized tile type!");
             tile_go.GetComponent<SpriteRenderer>().sprite = null;
         }
     }
