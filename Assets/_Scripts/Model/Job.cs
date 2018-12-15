@@ -7,7 +7,7 @@ public class Job {
 
     Tile _tile;
 
-    float _jobTile;
+    float _jobTime;
 
     string _jobObjectType; 
 
@@ -42,12 +42,13 @@ public class Job {
         this._tile = tile;
         this._jobObjectType = jobObjectType;
         this._cbJobCompleted += cbJobCompleted;
+        this._jobTime = jobTime;
     }
 
     public void WorkOnJob(float workTime)
     {
-        _jobTile -= workTime;
-        if (_jobTile <= 0)
+        _jobTime -= workTime;
+        if (_jobTime <= 0)
         {
             if (_cbJobCompleted != null)
             {

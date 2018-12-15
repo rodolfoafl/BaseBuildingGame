@@ -116,12 +116,12 @@ public class Tile {
 
     public bool IsNeighbour(Tile tile, bool diagonalOk = false)
     {
-        if(this.X == tile.X && (this.Y == tile.Y + 1 || this.Y == tile.Y - 1))
+        if(this.X == tile.X && (Mathf.Abs(this.Y - tile.Y) == 1))
         {
             return true;
         }
 
-        if (this.Y == tile.Y && (this.X == tile.X + 1 || this.X == tile.X - 1))
+        if (this.Y == tile.Y && (Mathf.Abs(this.X - tile.X) == 1))
         {
             return true;
         }
