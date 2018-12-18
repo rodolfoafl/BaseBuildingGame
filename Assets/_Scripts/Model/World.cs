@@ -6,7 +6,10 @@ using UnityEngine;
 public class World {
 
     Tile[,] _tiles;
+
     List<Character> _characters;
+
+    Path_TileGraph _tileGraph;
 
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
 
@@ -46,6 +49,19 @@ public class World {
         set
         {
             _jobQueue = value;
+        }
+    }
+
+    public Path_TileGraph TileGraph
+    {
+        get
+        {
+            return _tileGraph;
+        }
+
+        set
+        {
+            _tileGraph = value;
         }
     }
     #endregion
@@ -153,16 +169,23 @@ public class World {
         if(_cbInstalledObjectCreated != null)
         {
             _cbInstalledObjectCreated(obj);
+            InvalidateTileGraph();
         }
     }
 
     void OnTileChanged(Tile t)
     {
+        InvalidateTileGraph();
         if (_cbTileChanged == null)
         {
             return;
         }
         _cbTileChanged(t);
+    }
+
+    public void InvalidateTileGraph()
+    {
+        _tileGraph = null;
     }
 
     public bool IsInstalledObjectPlacementValid(string installedObjectType, Tile tile)

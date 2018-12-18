@@ -27,6 +27,10 @@ public class Path_Node<T> {
         {
             return _edges;
         }
+        set
+        {
+            _edges = value;
+        }
     }
     #endregion
 }

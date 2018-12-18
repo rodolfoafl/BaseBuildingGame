@@ -62,7 +62,6 @@ public class Character {
             }
         }
 
-        //Reached destination yet?
         if(_currentTile == _destinationTile)
         {
             if(_myJob != null)
@@ -73,20 +72,15 @@ public class Character {
             return;
         }
 
-        //The distance from point A to point B
         float distanceToTravel = Vector2.Distance(new Vector2(_currentTile.X, _currentTile.Y), new Vector2(_destinationTile.X, _destinationTile.Y));
 
-        //Distance traveled this frame
         float distanceThisFrame = _speed * deltaTime;
 
-        //Percentage to our destination
         float percentageThisFrame = distanceToTravel <= 0 ? 1 : distanceThisFrame / distanceToTravel;
 
-        //Add to overral percentage travelled
         _movementPercentage += percentageThisFrame;
         if(_movementPercentage >= 1)
         {
-            //Reached the destination
             _currentTile = _destinationTile;
             _movementPercentage = 0f;
         }

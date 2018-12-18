@@ -158,6 +158,43 @@ public class Tile {
         return false;
     }
 
+    public Tile[] GetNeighbours(bool diagonalOk = false)
+    {
+        Tile[] neighbours;
+        if (!diagonalOk)
+        {
+            neighbours = new Tile[4];
+        }
+        else
+        {
+            neighbours = new Tile[8];
+        }
+
+        Tile neighbour;
+        neighbour = World.GetTileAt(X, Y + 1);
+        neighbours[0] = neighbour;
+        neighbour = World.GetTileAt(X + 1, Y);
+        neighbours[1] = neighbour;
+        neighbour = World.GetTileAt(X, Y - 1);
+        neighbours[2] = neighbour;
+        neighbour = World.GetTileAt(X - 1, Y);
+        neighbours[3] = neighbour;
+
+        if (diagonalOk)
+        {
+            neighbour = World.GetTileAt(X + 1, Y + 1);
+            neighbours[4] = neighbour;
+            neighbour = World.GetTileAt(X + 1, Y - 1);
+            neighbours[5] = neighbour;
+            neighbour = World.GetTileAt(X - 1, Y - 1);
+            neighbours[6] = neighbour;
+            neighbour = World.GetTileAt(X - 1, Y + 1);
+            neighbours[7] = neighbour;
+        }
+
+        return neighbours;
+    }
+
     #region Callbacks
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)
     {

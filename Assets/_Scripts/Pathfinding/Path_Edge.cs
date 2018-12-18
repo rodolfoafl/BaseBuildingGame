@@ -16,6 +16,10 @@ public class Path_Edge<T> {
         {
             return _node;
         }
+        set
+        {
+            _node = value;
+        }
     }
 
     public float Cost
@@ -23,6 +27,10 @@ public class Path_Edge<T> {
         get
         {
             return _cost;
+        }
+        set
+        {
+            _cost = value;
         }
     }
     #endregion
