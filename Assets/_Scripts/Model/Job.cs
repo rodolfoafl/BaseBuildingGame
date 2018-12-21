@@ -37,7 +37,7 @@ public class Job {
     }
     #endregion
 
-    public Job(Tile tile, string jobObjectType, Action<Job> cbJobCompleted, float jobTime = 1f)
+    public Job(Tile tile, string jobObjectType, Action<Job> cbJobCompleted, float jobTime = .1f)
     {
         this._tile = tile;
         this._jobObjectType = jobObjectType;

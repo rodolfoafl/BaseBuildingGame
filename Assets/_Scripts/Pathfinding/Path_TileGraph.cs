@@ -36,15 +36,35 @@ public class Path_TileGraph {
             {
                 if(neighbours[i] != null && neighbours[i].MovementCost > 0)
                 {
+                    if(CheckIfNeighbourIsUnwalkable(i, neighbours))
+                    {
+                        continue;
+                    }
+
                     Path_Edge<Tile> edge = new Path_Edge<Tile>();
                     edge.Cost = neighbours[i].MovementCost;
                     edge.Node = _nodes[neighbours[i]];
-                    edges.Add(edge);
+                    edges.Add(edge); 
                 }
             }
 
             node.Edges = edges.ToArray();
         }
+    }
+
+    bool CheckIfNeighbourIsUnwalkable(int i, Tile[] ns)
+    {
+        if (i >= 4)
+        {
+            if (ns[0].MovementCost == 0
+                || ns[1].MovementCost == 0
+                || ns[2].MovementCost == 0
+                || ns[3].MovementCost == 0)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     #region Properties

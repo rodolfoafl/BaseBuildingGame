@@ -8,7 +8,7 @@ public class Character {
     float _x;
     float _y;
     float _movementPercentage;
-    float _speed = 2f;
+    float _speed = 5f;
 
     Tile _currentTile;
     Tile _destinationTile;
