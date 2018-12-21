@@ -15,12 +15,12 @@ public class Path_TileGraph {
             for (int y = 0; y < world.Height; y++)
             {
                 Tile tile = world.GetTileAt(x, y);
-                if(tile.MovementCost > 0)
-                {
+                //if(tile.MovementCost > 0)
+                //{
                     Path_Node<Tile> node = new Path_Node<Tile>();
                     node.Data = tile;
                     _nodes.Add(tile, node);
-                }
+                //}
             }
         }
 

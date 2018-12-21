@@ -17,9 +17,6 @@ public class Path_AStar {
 
         Dictionary<Tile, Path_Node<Tile>> nodes = world.TileGraph.Nodes;
 
-        Path_Node<Tile> start = nodes[tileStart];
-        Path_Node<Tile> goal = nodes[tileEnd];
-
         Path_Node<Tile> nodeStart;
         if (!nodes.TryGetValue(tileStart, out nodeStart))
         {
@@ -33,6 +30,9 @@ public class Path_AStar {
             Debug.LogError("Path_AStar -- the ending tile isn't in the list of tile nodes");
             return;
         }
+
+        Path_Node<Tile> start = nodes[tileStart];
+        Path_Node<Tile> goal = nodes[tileEnd];
 
         List<Path_Node<Tile>> closedSet = new List<Path_Node<Tile>>();
 
@@ -75,7 +75,9 @@ public class Path_AStar {
                 {
                     continue;
                 }
-                float tentative_g_score = g_score[current] + DistanceBetween(current, neighbour.Node);
+
+                float neighbourMovementCost = neighbour.Cost * DistanceBetween(current, neighbour.Node);
+                float tentative_g_score = g_score[current] + neighbourMovementCost;
 
                 if(openSet.Contains(neighbour.Node) && tentative_g_score >= g_score[neighbour.Node])
                 {
@@ -131,5 +133,14 @@ public class Path_AStar {
     public Tile GetNextTile()
     {
         return _path.Dequeue();
+    }
+
+    public int Length()
+    {
+        if(_path == null)
+        {
+            return 0;
+        }
+        return _path.Count;
     }
 }

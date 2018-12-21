@@ -141,9 +141,9 @@ public class World {
 
     public Tile GetTileAt(int x, int y)
     {
-        if(x > _width || x < 0 || y > _height || y < 0)
+        if(x >= _width || x < 0 || y >= _height || y < 0)
         {
-            Debug.LogError("Tile (" + x + ", " + y + ") is out of range.");
+            //Debug.LogError("Tile (" + x + ", " + y + ") is out of range.");
             return null;
         }
         return _tiles[x, y];
