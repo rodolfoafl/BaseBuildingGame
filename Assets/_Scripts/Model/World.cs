@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using UnityEngine;
 
-public class World {
+public class World : IXmlSerializable{
 
     Tile[,] _tiles;
 
@@ -66,7 +69,7 @@ public class World {
     }
     #endregion
 
-    public World(int width = 100, int height = 100)
+    public World(int width, int height)
     {
         this._width = width;
         this._height = height;
@@ -258,5 +261,36 @@ public class World {
     }
     #endregion
 
+    #region Saving & Loading
+    
+    public World()
+    {
+
+    }
+
+    public XmlSchema GetSchema()
+    {
+        return null;
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        //writer.WriteAttributeString("Width", Width.ToString());
+        writer.WriteStartElement("Width");
+        writer.WriteValue(Width);
+        writer.WriteEndElement();
+
+        //writer.WriteAttributeString("Height", Height.ToString());
+        writer.WriteStartElement("Height");
+        writer.WriteValue(Height);
+        writer.WriteEndElement();
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+
+    }
+
+    #endregion
 
 }
