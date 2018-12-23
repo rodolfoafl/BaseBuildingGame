@@ -71,6 +71,11 @@ public class World : IXmlSerializable{
 
     public World(int width, int height)
     {
+        SetupNewWorld(width, height);
+    }
+
+    void SetupNewWorld(int width, int height)
+    {
         this._width = width;
         this._height = height;
 
@@ -275,20 +280,58 @@ public class World : IXmlSerializable{
 
     public void WriteXml(XmlWriter writer)
     {
-        //writer.WriteAttributeString("Width", Width.ToString());
-        writer.WriteStartElement("Width");
+        /*writer.WriteStartElement("Width");
         writer.WriteValue(Width);
         writer.WriteEndElement();
+        */
 
-        //writer.WriteAttributeString("Height", Height.ToString());
-        writer.WriteStartElement("Height");
-        writer.WriteValue(Height);
+        writer.WriteAttributeString("Width", Width.ToString());
+        writer.WriteAttributeString("Height", Height.ToString());
+
+        writer.WriteStartElement("Tiles");
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                //if (_tiles[x, y].Type != TileType.Empty)
+                //{
+                    writer.WriteStartElement("Tile");
+                    _tiles[x, y].WriteXml(writer);
+                    writer.WriteEndElement();
+                //}
+            }
+        }
         writer.WriteEndElement();
+
     }
 
     public void ReadXml(XmlReader reader)
     {
+        //int w = int.Parse(reader.GetAttribute("Width"));
+        reader.MoveToAttribute("Width");
+        int w = reader.ReadContentAsInt();
+        reader.MoveToAttribute("Height");
+        int h = reader.ReadContentAsInt();
 
+        SetupNewWorld(w, h);
+
+        reader.MoveToElement();
+        reader.ReadToDescendant("Tiles");
+        reader.ReadToDescendant("Tile");
+        while (reader.IsStartElement("Tile"))
+        {
+            reader.MoveToAttribute("X");
+            int x = reader.ReadContentAsInt();
+            reader.MoveToAttribute("Y");
+            int y = reader.ReadContentAsInt();
+            reader.MoveToAttribute("Type");
+
+            _tiles[x, y].ReadXml(reader);
+
+            reader.ReadToNextSibling("Tile");
+
+            break;
+        }
     }
 
     #endregion

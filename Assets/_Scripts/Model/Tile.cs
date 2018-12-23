@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
 using UnityEngine;
 
 public enum TileType { Empty, Floor };
@@ -49,6 +51,11 @@ public class Tile {
         {
             return _x;
         }
+
+        protected set
+        {
+            _x = value;
+        }
     }
 
     public int Y
@@ -56,6 +63,11 @@ public class Tile {
         get
         {
             return _y;
+        }
+
+        protected set
+        {
+            _y = value;
         }
     }
 
@@ -206,4 +218,37 @@ public class Tile {
         _cbTileChanged -= callback;
     }
     #endregion
+
+    #region Saving & Loading
+
+    public Tile()
+    {
+
+    }
+
+    public XmlSchema GetSchema()
+    {
+        return null;
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        writer.WriteAttributeString("X", X.ToString());
+        writer.WriteAttributeString("Y", Y.ToString());
+        writer.WriteAttributeString("Type", Type.ToString());
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+        reader.MoveToAttribute("X");
+        X = reader.ReadContentAsInt();
+        reader.MoveToAttribute("Y");
+        Y = reader.ReadContentAsInt();
+        reader.MoveToAttribute("Type");
+        string t = reader.ReadContentAsString();
+        Type = (TileType)Enum.Parse(typeof(TileType), t);
+    }
+
+    #endregion
+
 }
