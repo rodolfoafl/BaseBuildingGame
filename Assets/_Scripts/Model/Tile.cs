@@ -240,12 +240,7 @@ public class Tile {
 
     public void ReadXml(XmlReader reader)
     {
-        reader.MoveToAttribute("X");
-        X = reader.ReadContentAsInt();
-        reader.MoveToAttribute("Y");
-        Y = reader.ReadContentAsInt();
-        reader.MoveToAttribute("Type");
-        string t = reader.ReadContentAsString();
+        string t = reader.GetAttribute("Type");
         Type = (TileType)Enum.Parse(typeof(TileType), t);
     }
 

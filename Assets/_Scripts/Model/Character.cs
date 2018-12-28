@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using UnityEngine;
 
-public class Character {
+public class Character: IXmlSerializable {
 
     float _x;
     float _y;
@@ -166,6 +169,29 @@ public class Character {
             return;
         }
         _myJob = null;
+    }
+    #endregion
+
+    #region Saving & Loading
+    public Character()
+    {
+
+    }
+
+    public XmlSchema GetSchema()
+    {
+        return null;
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        writer.WriteAttributeString("X", CurrentTile.X.ToString());
+        writer.WriteAttributeString("Y", CurrentTile.Y.ToString());
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+
     }
     #endregion
 }

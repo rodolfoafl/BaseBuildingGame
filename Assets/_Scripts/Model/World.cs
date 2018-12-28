@@ -11,11 +11,12 @@ public class World : IXmlSerializable{
     Tile[,] _tiles;
 
     List<Character> _characters;
+    List<InstalledObject> _installedObjects;
 
     Path_TileGraph _tileGraph;
 
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
-
+    
     Action<InstalledObject> _cbInstalledObjectCreated;
     Action<Character> _cbCharacterCreated;
     Action<Tile> _cbTileChanged;
@@ -67,11 +68,29 @@ public class World : IXmlSerializable{
             _tileGraph = value;
         }
     }
+
+    public List<InstalledObject> InstalledObjects
+    {
+        get
+        {
+            return _installedObjects;
+        }
+    }
+
+    public List<Character> Characters
+    {
+        get
+        {
+            return _characters;
+        }
+    }
     #endregion
 
     public World(int width, int height)
     {
         SetupNewWorld(width, height);
+
+        Character character = CreateCharacter(GetTileAt(width / 2, height / 2));
     }
 
     void SetupNewWorld(int width, int height)
@@ -97,6 +116,7 @@ public class World : IXmlSerializable{
         InitializeInstalledObjectPrototypesDictionary();
 
         _characters = new List<Character>();
+        _installedObjects = new List<InstalledObject>();
     }
 
     public void Update(float deltaTime)
@@ -158,27 +178,31 @@ public class World : IXmlSerializable{
     }
 
     //Assumes 1x1 tiles.
-    public void PlaceInstalledObject(string objectType, Tile tile)
+    public InstalledObject PlaceInstalledObject(string objectType, Tile tile)
     {
         InstalledObject instObj;
         if (!_installedObjectPrototypes.TryGetValue(objectType, out instObj))
         {
             Debug.LogError("_installedObjectPrototypes doesn't contain the objectType!");
-            return;
+            return null;
         }
 
         InstalledObject obj = InstalledObject.PlaceInstance(instObj, tile);
         if(obj == null)
         {
             //Failed to place object. Most likely there was already something there.
-            return;
+            return null;
         }
+
+        _installedObjects.Add(obj);
 
         if(_cbInstalledObjectCreated != null)
         {
             _cbInstalledObjectCreated(obj);
             InvalidateTileGraph();
         }
+
+        return obj;
     }
 
     void OnTileChanged(Tile t)
@@ -280,57 +304,120 @@ public class World : IXmlSerializable{
 
     public void WriteXml(XmlWriter writer)
     {
-        /*writer.WriteStartElement("Width");
-        writer.WriteValue(Width);
-        writer.WriteEndElement();
-        */
-
         writer.WriteAttributeString("Width", Width.ToString());
         writer.WriteAttributeString("Height", Height.ToString());
 
+        //TILES
         writer.WriteStartElement("Tiles");
         for (int x = 0; x < Width; x++)
         {
             for (int y = 0; y < Height; y++)
             {
-                //if (_tiles[x, y].Type != TileType.Empty)
-                //{
+                if (_tiles[x, y].Type != TileType.Empty)
+                {
                     writer.WriteStartElement("Tile");
                     _tiles[x, y].WriteXml(writer);
                     writer.WriteEndElement();
-                //}
+                }
             }
         }
         writer.WriteEndElement();
 
+        //INSTALLEDOBJECTS
+        writer.WriteStartElement("InstalledObjects");
+        foreach(InstalledObject obj in _installedObjects)
+        {
+            writer.WriteStartElement("InstalledObject");
+            obj.WriteXml(writer);
+            writer.WriteEndElement();
+        }
+        writer.WriteEndElement();
+
+        //CHARACTERS
+        writer.WriteStartElement("Characters");
+        foreach (Character c in _characters)
+        {
+            writer.WriteStartElement("Character");
+            c.WriteXml(writer);
+            writer.WriteEndElement();
+        }
+        writer.WriteEndElement();
     }
 
     public void ReadXml(XmlReader reader)
     {
-        //int w = int.Parse(reader.GetAttribute("Width"));
-        reader.MoveToAttribute("Width");
-        int w = reader.ReadContentAsInt();
-        reader.MoveToAttribute("Height");
-        int h = reader.ReadContentAsInt();
+        int w = int.Parse(reader.GetAttribute("Width"));
+        int h = int.Parse(reader.GetAttribute("Height"));
 
         SetupNewWorld(w, h);
 
-        reader.MoveToElement();
-        reader.ReadToDescendant("Tiles");
-        reader.ReadToDescendant("Tile");
-        while (reader.IsStartElement("Tile"))
+        while (reader.Read())
         {
-            reader.MoveToAttribute("X");
-            int x = reader.ReadContentAsInt();
-            reader.MoveToAttribute("Y");
-            int y = reader.ReadContentAsInt();
-            reader.MoveToAttribute("Type");
+            switch (reader.Name)
+            {
+                case "Tiles":
+                    ReadXml_Tiles(reader);
+                    break;
+                case "InstalledObjects":
+                    ReadXml_InstalledObjects(reader);
+                    break;
+                case "Characters":
+                    ReadXml_Characters(reader);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    void ReadXml_Characters(XmlReader reader)
+    {
+        while (reader.Read())
+        {
+            if (reader.Name != "Character")
+            {
+                return;
+            }
+
+            int x = int.Parse(reader.GetAttribute("X"));
+            int y = int.Parse(reader.GetAttribute("Y"));
+
+            Character c = CreateCharacter(_tiles[x, y]);
+            c.ReadXml(reader);
+        }
+    }
+
+    void ReadXml_Tiles(XmlReader reader)
+    {
+        while (reader.Read())
+        {
+            if(reader.Name != "Tile")
+            {
+                return;
+            }
+
+            int x = int.Parse(reader.GetAttribute("X"));
+            int y = int.Parse(reader.GetAttribute("Y"));
 
             _tiles[x, y].ReadXml(reader);
+        }
+    }
 
-            reader.ReadToNextSibling("Tile");
+    void ReadXml_InstalledObjects(XmlReader reader)
+    {
+        while (reader.Read())
+        {
+            if (reader.Name != "InstalledObject")
+            {
+                return;
+            }
 
-            break;
+            int x = int.Parse(reader.GetAttribute("X"));
+            int y = int.Parse(reader.GetAttribute("Y"));
+
+            InstalledObject obj = PlaceInstalledObject(reader.GetAttribute("ObjectType"), _tiles[x, y]);
+            obj.ReadXml(reader);
         }
     }
 

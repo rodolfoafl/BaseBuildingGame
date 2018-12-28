@@ -19,8 +19,10 @@ public class CharacterSpriteController : MonoBehaviour {
 
         _world.RegisterCharacterCreated(OnCharacterCreated);
 
-        Character newCharacter = _world.CreateCharacter(_world.GetTileAt(_world.Width / 2, _world.Height / 2));
-        //newCharacter.SetDestination(_world.GetTileAt(_world.Width / 2 + 5, _world.Height / 2));
+        foreach(Character c in _world.Characters)
+        {
+            OnCharacterCreated(c);
+        }
     }
 
     void LoadSprites()

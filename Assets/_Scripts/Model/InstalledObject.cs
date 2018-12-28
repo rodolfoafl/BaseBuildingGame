@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using UnityEngine;
 
-public class InstalledObject{
+public class InstalledObject: IXmlSerializable{
 
     Tile _tile;
 
@@ -26,6 +29,11 @@ public class InstalledObject{
         get
         {
             return _objectType;
+        }
+
+        protected set
+        {
+            _objectType = value;
         }
     }
 
@@ -51,13 +59,12 @@ public class InstalledObject{
         {
             return _movementCost;
         }
+        protected set
+        {
+            _movementCost = value;
+        }
     }
     #endregion
-
-    protected InstalledObject()
-    {
-
-    }
 
     public static InstalledObject CreatePrototype(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbor = false)
     {
@@ -102,25 +109,25 @@ public class InstalledObject{
             int y = tile.Y;
 
             t = tile.World.GetTileAt(x, y + 1);
-            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType) && t.InstalledObject._cbOnInstalledObjectChanged != null)
             {
                 t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
 
             t = tile.World.GetTileAt(x + 1, y);
-            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType) && t.InstalledObject._cbOnInstalledObjectChanged != null)
             {
                 t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
 
             t = tile.World.GetTileAt(x, y - 1);
-            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType) && t.InstalledObject._cbOnInstalledObjectChanged != null)
             {
                 t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
 
             t = tile.World.GetTileAt(x - 1, y);
-            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType))
+            if (t != null && t.InstalledObject != null && t.InstalledObject.ObjectType.Equals(obj.ObjectType) && t.InstalledObject._cbOnInstalledObjectChanged != null)
             {
                 t.InstalledObject._cbOnInstalledObjectChanged(t.InstalledObject);
             }
@@ -158,6 +165,31 @@ public class InstalledObject{
     public void UnregisterOnInstalledObjectChangedCallback(Action<InstalledObject> callback)
     {
         _cbOnInstalledObjectChanged -= callback;
+    }
+    #endregion
+
+    #region Saving & Loading
+    public InstalledObject()
+    {
+
+    }
+
+    public XmlSchema GetSchema()
+    {
+        return null;
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        writer.WriteAttributeString("X", Tile.X.ToString());
+        writer.WriteAttributeString("Y", Tile.Y.ToString());
+        writer.WriteAttributeString("ObjectType", ObjectType);
+        writer.WriteAttributeString("MovementCost", MovementCost.ToString());
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+        MovementCost = int.Parse(reader.GetAttribute("MovementCost"));
     }
     #endregion
 }

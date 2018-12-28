@@ -31,7 +31,7 @@ public class TileSpriteController : MonoBehaviour {
                 tile_go.transform.SetParent(this.transform, true);
 
                 tile_go.AddComponent<SpriteRenderer>().sprite = _emptySprite;
-
+                OnTileChanged(tile_data);
                 //tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); });
                 //tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
