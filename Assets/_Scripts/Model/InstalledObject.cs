@@ -9,7 +9,7 @@ using UnityEngine;
 public class InstalledObject: IXmlSerializable{
 
     #region NOT DEFINITIVE
-    public Dictionary<string, object> _installedObjectParameters;
+    public Dictionary<string, float> _installedObjectParameters;
     public Action<InstalledObject, float> _updateActions;
 
     public void Update(float deltaTime)
@@ -92,7 +92,7 @@ public class InstalledObject: IXmlSerializable{
         this._height = other._height;
         this._linksToNeighbor = other._linksToNeighbor;
 
-        this._installedObjectParameters = new Dictionary<string, object>(other._installedObjectParameters);
+        this._installedObjectParameters = new Dictionary<string, float>(other._installedObjectParameters);
         if (other._updateActions != null)
         {
             this._updateActions = (Action<InstalledObject, float>)other._updateActions.Clone();
@@ -115,7 +115,7 @@ public class InstalledObject: IXmlSerializable{
 
         this.funcPositionValidation = this._IsValidPosition;
 
-        this._installedObjectParameters = new Dictionary<string, object>();
+        this._installedObjectParameters = new Dictionary<string, float>();
     }
 
     public static InstalledObject PlaceInstance(InstalledObject proto, Tile tile)
@@ -203,7 +203,7 @@ public class InstalledObject: IXmlSerializable{
     #region Saving & Loading
     public InstalledObject()
     {
-        _installedObjectParameters = new Dictionary<string, object>();
+        _installedObjectParameters = new Dictionary<string, float>();
     }
 
     public XmlSchema GetSchema()
@@ -216,12 +216,29 @@ public class InstalledObject: IXmlSerializable{
         writer.WriteAttributeString("X", Tile.X.ToString());
         writer.WriteAttributeString("Y", Tile.Y.ToString());
         writer.WriteAttributeString("ObjectType", ObjectType);
-        writer.WriteAttributeString("MovementCost", MovementCost.ToString());
+        //writer.WriteAttributeString("MovementCost", MovementCost.ToString());
+
+        foreach (string key in _installedObjectParameters.Keys) {
+            writer.WriteStartElement("Parameter");
+            writer.WriteAttributeString("name", key);
+            writer.WriteAttributeString("value", _installedObjectParameters[key].ToString());
+            writer.WriteEndElement();
+        }
     }
 
     public void ReadXml(XmlReader reader)
     {
-        MovementCost = int.Parse(reader.GetAttribute("MovementCost"));
+        //MovementCost = int.Parse(reader.GetAttribute("MovementCost"));
+
+        if (reader.ReadToDescendant("Parameter"))
+        {
+            do
+            {
+                string key = reader.GetAttribute("name");
+                float value = float.Parse(reader.GetAttribute("value"));
+                _installedObjectParameters[key] = value;
+            } while (reader.ReadToNextSibling("Parameter"));
+        }
     }
     #endregion
 }

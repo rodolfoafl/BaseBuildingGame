@@ -125,6 +125,11 @@ public class World : IXmlSerializable{
         {
             c.Update(deltaTime);
         }
+
+        foreach(InstalledObject obj in _installedObjects)
+        {
+            obj.Update(deltaTime);
+        }
     }
 
     public Character CreateCharacter(Tile tile)
@@ -146,7 +151,7 @@ public class World : IXmlSerializable{
         InstalledObject wallPrototype =  new InstalledObject("Wall", 0, 1, 1, true);
         _installedObjectPrototypes.Add("Wall", wallPrototype);
 
-        InstalledObject doorPrototype = new InstalledObject("Door", 0, 1, 1, true);
+        InstalledObject doorPrototype = new InstalledObject("Door", 1, 1, 1, false);
         _installedObjectPrototypes.Add("Door", doorPrototype);
 
         _installedObjectPrototypes["Door"]._installedObjectParameters["openness"] = 0;
@@ -378,51 +383,45 @@ public class World : IXmlSerializable{
 
     void ReadXml_Characters(XmlReader reader)
     {
-        while (reader.Read())
+        if (reader.ReadToDescendant("Character"))
         {
-            if (reader.Name != "Character")
+            do
             {
-                return;
-            }
+                int x = int.Parse(reader.GetAttribute("X"));
+                int y = int.Parse(reader.GetAttribute("Y"));
 
-            int x = int.Parse(reader.GetAttribute("X"));
-            int y = int.Parse(reader.GetAttribute("Y"));
-
-            Character c = CreateCharacter(_tiles[x, y]);
-            c.ReadXml(reader);
+                Character c = CreateCharacter(_tiles[x, y]);
+                c.ReadXml(reader);
+            } while (reader.ReadToNextSibling("Character"));
         }
-    }
+}
 
     void ReadXml_Tiles(XmlReader reader)
     {
-        while (reader.Read())
+        if (reader.ReadToDescendant("Tile"))
         {
-            if(reader.Name != "Tile")
+            do
             {
-                return;
-            }
-
-            int x = int.Parse(reader.GetAttribute("X"));
-            int y = int.Parse(reader.GetAttribute("Y"));
-
-            _tiles[x, y].ReadXml(reader);
+                int x = int.Parse(reader.GetAttribute("X"));
+                int y = int.Parse(reader.GetAttribute("Y"));
+                _tiles[x, y].ReadXml(reader);
+            } while (reader.ReadToNextSibling("Tile"));
         }
     }
 
     void ReadXml_InstalledObjects(XmlReader reader)
     {
-        while (reader.Read())
+
+        if(reader.ReadToDescendant("InstalledObject"))
         {
-            if (reader.Name != "InstalledObject")
+            do
             {
-                return;
-            }
+                int x = int.Parse(reader.GetAttribute("X"));
+                int y = int.Parse(reader.GetAttribute("Y"));
 
-            int x = int.Parse(reader.GetAttribute("X"));
-            int y = int.Parse(reader.GetAttribute("Y"));
-
-            InstalledObject obj = PlaceInstalledObject(reader.GetAttribute("ObjectType"), _tiles[x, y]);
-            obj.ReadXml(reader);
+                InstalledObject obj = PlaceInstalledObject(reader.GetAttribute("ObjectType"), _tiles[x, y]);
+                obj.ReadXml(reader);
+            } while (reader.ReadToNextSibling("InstalledObject"));
         }
     }
 

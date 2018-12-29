@@ -96,8 +96,8 @@ public class Character: IXmlSerializable {
 
         if(_nextTile == null || _nextTile == _currentTile)
         {
-           if(_pathAStar == null || _pathAStar.Length() == 0)
-           {
+            if(_pathAStar == null || _pathAStar.Length() == 0)
+            {
                 _pathAStar = new Path_AStar(WorldController.Instance.World, _currentTile, _destinationTile);
                 if(_pathAStar.Length() == 0)
                 {
@@ -105,7 +105,10 @@ public class Character: IXmlSerializable {
                     AbandonJob();
                     return;
                 }
-           }
+
+                _nextTile = _pathAStar.GetNextTile();
+            }
+
             _nextTile = _pathAStar.GetNextTile();
             if(_nextTile == _currentTile)
             {
@@ -115,9 +118,17 @@ public class Character: IXmlSerializable {
 
         //float distanceToTravel = Mathf.Sqrt(Mathf.Pow(_currentTile.X - _nextTile.X, 2) + Mathf.Pow(_currentTile.Y - _nextTile.Y, 2));
 
+        if(_nextTile.MovementCost == 0)
+        {
+            Debug.LogError("A character was trying to enter an unwalkable tile!");
+            _nextTile = null;
+            _pathAStar = null;
+            return;
+        }
+
         float distanceToTravel = Vector2.Distance(new Vector2(_currentTile.X, _currentTile.Y), new Vector2(_nextTile.X, _nextTile.Y));
 
-        float distanceThisFrame = _speed * deltaTime;
+        float distanceThisFrame = (_speed / _nextTile.MovementCost) * deltaTime;
 
         float percentageThisFrame = distanceToTravel <= 0 ? 1 : distanceThisFrame / distanceToTravel;
 

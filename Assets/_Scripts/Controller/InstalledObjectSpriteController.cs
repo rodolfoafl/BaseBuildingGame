@@ -91,7 +91,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         Sprite sprite;
         if (!_stringSpritesMap.TryGetValue(spriteName, out sprite))
         {
-            Debug.LogError("_stringSpritesMap doesn't contain the Sprite!");
+            Debug.LogError("_stringSpritesMap doesn't contain the Sprite: " + spriteName);
             return null;
         }
 
