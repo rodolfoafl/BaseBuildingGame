@@ -8,6 +8,20 @@ using UnityEngine;
 
 public class InstalledObject: IXmlSerializable{
 
+    #region NOT DEFINITIVE
+    public Dictionary<string, object> _installedObjectParameters;
+    public Action<InstalledObject, float> _updateActions;
+
+    public void Update(float deltaTime)
+    {
+        if(_updateActions != null)
+        {
+            _updateActions(this, deltaTime);
+        }
+    }
+
+    #endregion
+
     Tile _tile;
 
     Action<InstalledObject> _cbOnInstalledObjectChanged;
@@ -66,18 +80,42 @@ public class InstalledObject: IXmlSerializable{
     }
     #endregion
 
-    public static InstalledObject CreatePrototype(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbor = false)
+    /// <summary>
+    /// Copy Constructor
+    /// </summary>
+    /// <param name="other">InstalledObject to be copied</param>
+    protected InstalledObject(InstalledObject other)
     {
-        InstalledObject obj = new InstalledObject();
-        obj._objectType = objectType;
-        obj._movementCost = movementCost;
-        obj._width = width;
-        obj._height = height;
-        obj._linksToNeighbor = linksToNeighbor;
+        this._objectType = other._objectType;
+        this._movementCost = other._movementCost;
+        this._width = other._width;
+        this._height = other._height;
+        this._linksToNeighbor = other._linksToNeighbor;
 
-        obj.funcPositionValidation = obj._IsValidPosition;
+        this._installedObjectParameters = new Dictionary<string, object>(other._installedObjectParameters);
+        if (other._updateActions != null)
+        {
+            this._updateActions = (Action<InstalledObject, float>)other._updateActions.Clone();
+        }
+    }
 
-        return obj;
+    virtual public InstalledObject Clone()
+    {
+        return new InstalledObject(this);
+    }
+
+    public InstalledObject (string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbor = false)
+    {
+        //InstalledObject obj = new InstalledObject();
+        this._objectType = objectType;
+        this._movementCost = movementCost;
+        this._width = width;
+        this._height = height;
+        this._linksToNeighbor = linksToNeighbor;
+
+        this.funcPositionValidation = this._IsValidPosition;
+
+        this._installedObjectParameters = new Dictionary<string, object>();
     }
 
     public static InstalledObject PlaceInstance(InstalledObject proto, Tile tile)
@@ -88,15 +126,9 @@ public class InstalledObject: IXmlSerializable{
             return null;
         }
 
-        InstalledObject obj = new InstalledObject();
-
-        obj._objectType = proto._objectType;
-        obj._movementCost = proto._movementCost;
-        obj._width = proto._width;
-        obj._height = proto._height;
-        obj._linksToNeighbor = proto._linksToNeighbor;
-
+        InstalledObject obj = proto.Clone();
         obj._tile = tile;
+
         if (!tile.AssignInstalledObject(obj))
         {
             return null;
@@ -171,7 +203,7 @@ public class InstalledObject: IXmlSerializable{
     #region Saving & Loading
     public InstalledObject()
     {
-
+        _installedObjectParameters = new Dictionary<string, object>();
     }
 
     public XmlSchema GetSchema()

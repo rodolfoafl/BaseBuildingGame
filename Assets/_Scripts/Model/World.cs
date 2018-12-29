@@ -143,9 +143,14 @@ public class World : IXmlSerializable{
     {
         _installedObjectPrototypes = new Dictionary<string, InstalledObject>();
 
-        InstalledObject wallPrototype = InstalledObject.CreatePrototype("Wall", 0, 1, 1, true);
-
+        InstalledObject wallPrototype =  new InstalledObject("Wall", 0, 1, 1, true);
         _installedObjectPrototypes.Add("Wall", wallPrototype);
+
+        InstalledObject doorPrototype = new InstalledObject("Door", 0, 1, 1, true);
+        _installedObjectPrototypes.Add("Door", doorPrototype);
+
+        _installedObjectPrototypes["Door"]._installedObjectParameters["openness"] = 0;
+        _installedObjectPrototypes["Door"]._updateActions += InstalledObjectAction.Door_UpdateAction;
     }
 
     public void RandomizeTiles()
