@@ -92,6 +92,10 @@ public class Path_AStar {
                 {
                     openSet.Enqueue(neighbour.Node, f_score[neighbour.Node]);
                 }
+                else
+                {
+                    openSet.UpdatePriority(neighbour.Node, f_score[neighbour.Node]);
+                }
             }
         }
 

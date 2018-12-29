@@ -11,6 +11,7 @@ public class InstalledObject: IXmlSerializable{
     #region NOT DEFINITIVE
     public Dictionary<string, float> _installedObjectParameters;
     public Action<InstalledObject, float> _updateActions;
+    public Func<InstalledObject, EnterableState> _checkEnterableState;
 
     public void Update(float deltaTime)
     {
@@ -97,6 +98,8 @@ public class InstalledObject: IXmlSerializable{
         {
             this._updateActions = (Action<InstalledObject, float>)other._updateActions.Clone();
         }
+
+        this._checkEnterableState = other._checkEnterableState;
     }
 
     virtual public InstalledObject Clone()

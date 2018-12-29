@@ -155,7 +155,9 @@ public class World : IXmlSerializable{
         _installedObjectPrototypes.Add("Door", doorPrototype);
 
         _installedObjectPrototypes["Door"]._installedObjectParameters["openness"] = 0;
+        _installedObjectPrototypes["Door"]._installedObjectParameters["openingState"] = 0;
         _installedObjectPrototypes["Door"]._updateActions += InstalledObjectAction.Door_UpdateAction;
+        _installedObjectPrototypes["Door"]._checkEnterableState = InstalledObjectAction.Door_EnterableState;
     }
 
     public void RandomizeTiles()

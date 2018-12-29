@@ -7,6 +7,8 @@ using UnityEngine;
 
 public enum TileType { Empty, Floor };
 
+public enum EnterableState { Yes, No, Soon };
+
 public class Tile {    
 
     TileType _type = TileType.Empty;
@@ -205,6 +207,21 @@ public class Tile {
         }
 
         return neighbours;
+    }
+
+    public EnterableState CheckEnterableState()
+    {
+        if(MovementCost == 0)
+        {
+            return EnterableState.No;
+        }
+
+        if(_installedObject != null && _installedObject._checkEnterableState != null)
+        {
+            return _installedObject._checkEnterableState(_installedObject);
+        }
+
+        return EnterableState.Yes;
     }
 
     #region Callbacks

@@ -118,12 +118,27 @@ public class Character: IXmlSerializable {
 
         //float distanceToTravel = Mathf.Sqrt(Mathf.Pow(_currentTile.X - _nextTile.X, 2) + Mathf.Pow(_currentTile.Y - _nextTile.Y, 2));
 
-        if(_nextTile.MovementCost == 0)
+        /*if(_nextTile.MovementCost == 0)
         {
             Debug.LogError("A character was trying to enter an unwalkable tile!");
             _nextTile = null;
             _pathAStar = null;
             return;
+        }*/
+
+        switch (_nextTile.CheckEnterableState())
+        {
+            case EnterableState.No:
+                Debug.LogError("A character was trying to enter an unwalkable tile!");
+                _nextTile = null;
+                _pathAStar = null;
+                return;
+            case EnterableState.Soon:
+                return;
+            case EnterableState.Yes:
+                break;
+            default:
+                break;
         }
 
         float distanceToTravel = Vector2.Distance(new Vector2(_currentTile.X, _currentTile.Y), new Vector2(_nextTile.X, _nextTile.Y));
