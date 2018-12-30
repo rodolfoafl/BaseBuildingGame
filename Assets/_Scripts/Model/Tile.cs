@@ -9,7 +9,9 @@ public enum TileType { Empty, Floor };
 
 public enum EnterableState { Yes, No, Soon };
 
-public class Tile {    
+public class Tile {
+
+    Room _room;
 
     TileType _type = TileType.Empty;
 
@@ -119,6 +121,19 @@ public class Tile {
             return baseTileMovementCost * InstalledObject.MovementCost;
         }
     }
+
+    public Room Room
+    {
+        get
+        {
+            return _room;
+        }
+
+        set
+        {
+            _room = value;
+        }
+    }
     #endregion
 
     public Tile( World world, int x, int y)
@@ -225,6 +240,51 @@ public class Tile {
 
         return EnterableState.Yes;
     }
+    
+    /*
+    #region Get Neighbour Methods
+    public Tile GetNorthNeighbour()
+    {
+        return World.GetTileAt(X, Y + 1);
+    }
+
+    public Tile GetSouthNeighbour()
+    {
+        return World.GetTileAt(X, Y - 1);
+    }
+
+    public Tile GetEastNeighbour()
+    {
+        return World.GetTileAt(X + 1, Y);
+    }
+
+    public Tile GetWestNeighbour()
+    {
+        return World.GetTileAt(X - 1, Y);
+    }
+
+    public Tile GetNorthEastNeighbour()
+    {
+        return World.GetTileAt(X + 1, Y + 1);
+    }
+
+    public Tile GetNorthWestNeighbour()
+    {
+        return World.GetTileAt(X - 1, Y + 1);
+    }
+
+    public Tile GetSouthEasthNeighbour()
+    {
+        return World.GetTileAt(X + 1, Y - 1);
+    }
+
+    public Tile GetSouthWestNeighbour()
+    {
+        return World.GetTileAt(X - 1, Y - 1);
+    }
+    #endregion
+    */
+
 
     #region Callbacks
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)

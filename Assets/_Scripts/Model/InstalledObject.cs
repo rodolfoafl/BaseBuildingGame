@@ -35,6 +35,7 @@ public class InstalledObject: IXmlSerializable{
     int _height;
 
     bool _linksToNeighbor = false;
+    bool _roomEnclosure;
 
     Func <Tile, bool> funcPositionValidation;
 
@@ -92,16 +93,26 @@ public class InstalledObject: IXmlSerializable{
             _cbOnInstalledObjectChanged = value;
         }
     }
+
+    public bool RoomEnclosure
+    {
+        get
+        {
+            return _roomEnclosure;
+        }
+
+        set
+        {
+            _roomEnclosure = value;
+        }
+    }
     #endregion
 
-    /// <summary>
-    /// Copy Constructor
-    /// </summary>
-    /// <param name="other">InstalledObject to be copied</param>
     protected InstalledObject(InstalledObject other)
     {
         this._objectType = other._objectType;
         this._movementCost = other._movementCost;
+        this._roomEnclosure = other._roomEnclosure;
         this._width = other._width;
         this._height = other._height;
         this._linksToNeighbor = other._linksToNeighbor;
@@ -120,11 +131,12 @@ public class InstalledObject: IXmlSerializable{
         return new InstalledObject(this);
     }
 
-    public InstalledObject (string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbor = false)
+    public InstalledObject (string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbor = false, bool roomEnclosure = false)
     {
         //InstalledObject obj = new InstalledObject();
         this._objectType = objectType;
         this._movementCost = movementCost;
+        this._roomEnclosure = roomEnclosure;
         this._width = width;
         this._height = height;
         this._linksToNeighbor = linksToNeighbor;

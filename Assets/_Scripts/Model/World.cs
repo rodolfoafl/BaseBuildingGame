@@ -12,6 +12,7 @@ public class World : IXmlSerializable{
 
     List<Character> _characters;
     List<InstalledObject> _installedObjects;
+    List<Room> _rooms;
 
     Path_TileGraph _tileGraph;
 
@@ -84,6 +85,19 @@ public class World : IXmlSerializable{
             return _characters;
         }
     }
+
+    public List<Room> Rooms
+    {
+        get
+        {
+            return _rooms;
+        }
+
+        set
+        {
+            _rooms = value;
+        }
+    }
     #endregion
 
     public World(int width, int height)
@@ -91,6 +105,27 @@ public class World : IXmlSerializable{
         SetupNewWorld(width, height);
 
         Character character = CreateCharacter(GetTileAt(width / 2, height / 2));
+    }
+
+    public Room GetOutsideRoom()
+    {
+        return _rooms[0];
+    }
+
+    public void DeleteRoom(Room room)
+    {
+        if(room == GetOutsideRoom())
+        {
+            Debug.LogError("Tried to delete the outside room!");
+            return;
+        }
+        _rooms.Remove(room);
+        room.UnassingnAllTiles();        
+    }
+
+    public void AddRoom(Room room)
+    {
+        _rooms.Add(room);
     }
 
     void SetupNewWorld(int width, int height)
@@ -102,12 +137,16 @@ public class World : IXmlSerializable{
 
         _jobQueue = new JobQueue();
 
+        _rooms = new List<Room>();
+        _rooms.Add(new Room());
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 _tiles[x, y] = new Tile(this, x, y);
                 _tiles[x, y].RegisterTileTypeChangedCallback(OnTileChanged);
+                _tiles[x, y].Room = GetOutsideRoom();
             }
         }
 
@@ -148,10 +187,10 @@ public class World : IXmlSerializable{
     {
         _installedObjectPrototypes = new Dictionary<string, InstalledObject>();
 
-        InstalledObject wallPrototype =  new InstalledObject("Wall", 0, 1, 1, true);
+        InstalledObject wallPrototype =  new InstalledObject("Wall", 0, 1, 1, true, true);
         _installedObjectPrototypes.Add("Wall", wallPrototype);
 
-        InstalledObject doorPrototype = new InstalledObject("Door", 1, 1, 1, false);
+        InstalledObject doorPrototype = new InstalledObject("Door", 1, 1, 1, false, true);
         _installedObjectPrototypes.Add("Door", doorPrototype);
 
         _installedObjectPrototypes["Door"]._installedObjectParameters["openness"] = 0;
@@ -208,10 +247,18 @@ public class World : IXmlSerializable{
 
         _installedObjects.Add(obj);
 
+        if (obj.RoomEnclosure)
+        {
+            Room.DoRoomFloodFill(obj);
+        }
+
         if(_cbInstalledObjectCreated != null)
         {
             _cbInstalledObjectCreated(obj);
-            InvalidateTileGraph();
+            if (obj.MovementCost != 1)
+            {
+                InvalidateTileGraph();
+            }
         }
 
         return obj;
