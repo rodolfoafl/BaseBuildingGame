@@ -26,6 +26,8 @@ public class Tile {
     int _x;
     int _y;
 
+    float baseTileMovementCost = 1;
+
     #region Properties
     public TileType Type
     {
@@ -112,9 +114,9 @@ public class Tile {
             }
             if(InstalledObject == null)
             {
-                return 1;
+                return baseTileMovementCost;
             }
-            return 1 * InstalledObject.MovementCost;
+            return baseTileMovementCost * InstalledObject.MovementCost;
         }
     }
     #endregion

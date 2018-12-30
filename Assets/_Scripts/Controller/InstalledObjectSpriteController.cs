@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class InstalledObjectSpriteController : MonoBehaviour {
@@ -44,6 +45,20 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         instObj.name = obj.ObjectType + "_" + obj.Tile.X + "_" + obj.Tile.Y;
         instObj.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0);
         instObj.transform.SetParent(this.transform, true);
+
+        if (obj.ObjectType == "Door")
+        {
+            Tile north = _world.GetTileAt(obj.Tile.X, obj.Tile.Y + 1);
+            Tile south = _world.GetTileAt(obj.Tile.X, obj.Tile.Y - 1);
+
+            if (north != null && south != null
+                && north.InstalledObject != null && south.InstalledObject != null
+                && north.InstalledObject.ObjectType == "Wall" && south.InstalledObject.ObjectType == "Wall")
+            {
+                instObj.transform.rotation = Quaternion.Euler(0, 0, 90);
+                instObj.transform.Translate(1f, 0, 0, Space.World);
+            }
+        }
 
         instObj.AddComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
         instObj.GetComponent<SpriteRenderer>().sortingLayerName = "InstalledObjects";
@@ -144,5 +159,31 @@ public class InstalledObjectSpriteController : MonoBehaviour {
             return;
         }
         inst_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
+
+        //Change Door sprite alpha to simulate opening/closing
+        if (obj.ObjectType == "Door")
+        {
+            //var color = inst_go.GetComponent<SpriteRenderer>().color;
+            if (obj._installedObjectParameters["openness"] < 0.1f)
+            {
+                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 1f);
+                inst_go.GetComponent<SpriteRenderer>().DOFade(1f, 0.25f);
+            }
+            else if (obj._installedObjectParameters["openness"] < 0.5f)
+            {
+                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.66f);
+                inst_go.GetComponent<SpriteRenderer>().DOFade(0.66f, 0.25f);
+            }
+            else if (obj._installedObjectParameters["openness"] < 0.9f)
+            {
+                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.33f);
+                inst_go.GetComponent<SpriteRenderer>().DOFade(0.33f, 0.25f);
+            }
+            else
+            {
+                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0f);
+                inst_go.GetComponent<SpriteRenderer>().DOFade(0f, 0.25f);
+            }
+        }
     }
 }

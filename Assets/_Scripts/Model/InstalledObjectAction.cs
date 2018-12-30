@@ -9,7 +9,7 @@ public static class InstalledObjectAction {
         //Debug.Log("Door_UpdateAction");
         if(obj._installedObjectParameters["openingState"] >= 1)
         {
-            obj._installedObjectParameters["openness"] += deltaTime;
+            obj._installedObjectParameters["openness"] += deltaTime * 4;
             if(obj._installedObjectParameters["openness"] >= 1)
             {
                 obj._installedObjectParameters["openingState"] = 0;
@@ -17,10 +17,15 @@ public static class InstalledObjectAction {
         }
         else
         {
-            obj._installedObjectParameters["openness"] -= deltaTime;
+            obj._installedObjectParameters["openness"] -= deltaTime * 4;
         }
 
         obj._installedObjectParameters["openness"] = Mathf.Clamp01(obj._installedObjectParameters["openness"]);
+
+        if (obj.CbOnInstalledObjectChanged != null)
+        {
+            obj.CbOnInstalledObjectChanged(obj);
+        }
     }
 
     public static EnterableState Door_EnterableState(InstalledObject obj)

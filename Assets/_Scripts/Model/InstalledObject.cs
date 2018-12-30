@@ -79,6 +79,19 @@ public class InstalledObject: IXmlSerializable{
             _movementCost = value;
         }
     }
+
+    public Action<InstalledObject> CbOnInstalledObjectChanged
+    {
+        get
+        {
+            return _cbOnInstalledObjectChanged;
+        }
+
+        set
+        {
+            _cbOnInstalledObjectChanged = value;
+        }
+    }
     #endregion
 
     /// <summary>
