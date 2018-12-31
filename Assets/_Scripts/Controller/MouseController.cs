@@ -39,6 +39,16 @@ public class MouseController : MonoBehaviour {
         _lastFramePosition.z = 0;
     }
 
+    public Vector3 GetMousePosition()
+    {
+        return _currFramePosition;
+    }
+
+    public Tile GetMouseOverTile()
+    {
+        return WorldController.Instance.World.GetTileAt(Mathf.FloorToInt(_currFramePosition.x), Mathf.FloorToInt(_currFramePosition.y));
+    }
+
     #region Mouse Related Methods
     void UpdateDragging()
     {
