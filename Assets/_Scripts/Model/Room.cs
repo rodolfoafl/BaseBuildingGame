@@ -158,6 +158,10 @@ public class Room {
             }
         }
 
+        newRoom.AtmosC02 = oldRoom.AtmosC02;
+        newRoom.AtmosN = oldRoom.AtmosN;
+        newRoom.AtmosO2 = oldRoom.AtmosO2;
+
         tile.World.AddRoom(newRoom);
     }
 }

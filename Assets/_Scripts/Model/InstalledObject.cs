@@ -9,8 +9,9 @@ using UnityEngine;
 public class InstalledObject: IXmlSerializable{
 
     #region NOT DEFINITIVE
-    public Dictionary<string, float> _installedObjectParameters;
-    public Action<InstalledObject, float> _updateActions;
+    Dictionary<string, float> _installedObjectParameters;
+    Action<InstalledObject, float> _updateActions;
+
     public Func<InstalledObject, EnterableState> _checkEnterableState;
 
     public void Update(float deltaTime)
@@ -20,7 +21,6 @@ public class InstalledObject: IXmlSerializable{
             _updateActions(this, deltaTime);
         }
     }
-
     #endregion
 
     Tile _tile;
@@ -214,6 +214,39 @@ public class InstalledObject: IXmlSerializable{
         }
 
         return true;
+    }
+
+    public float GetParameter(string key, float defaultValue = 0)
+    {
+        if (!_installedObjectParameters.ContainsKey(key))
+        {
+            return defaultValue;
+        }
+        return _installedObjectParameters[key];
+    }
+
+    public void SetParameter(string key, float value)
+    {
+        _installedObjectParameters[key] = value;
+    }
+
+    public void ChangeParameter(string key, float value)
+    {
+        if (!_installedObjectParameters.ContainsKey(key))
+        {
+            _installedObjectParameters[key] = value;
+        }
+        _installedObjectParameters[key] += value;
+    }
+
+    public void RegisterUpdateAction(Action<InstalledObject, float> action)
+    {
+        _updateActions += action;
+    }
+
+    public void UnregisterUpdateAction(Action<InstalledObject, float> action)
+    {
+        _updateActions -= action;
     }
 
     #region Callbacks

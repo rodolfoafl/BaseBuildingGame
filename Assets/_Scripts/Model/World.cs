@@ -193,9 +193,9 @@ public class World : IXmlSerializable{
         InstalledObject doorPrototype = new InstalledObject("Door", 1, 1, 1, false, true);
         _installedObjectPrototypes.Add("Door", doorPrototype);
 
-        _installedObjectPrototypes["Door"]._installedObjectParameters["openness"] = 0;
-        _installedObjectPrototypes["Door"]._installedObjectParameters["openingState"] = 0;
-        _installedObjectPrototypes["Door"]._updateActions += InstalledObjectAction.Door_UpdateAction;
+        _installedObjectPrototypes["Door"].SetParameter("openness", 0);
+        _installedObjectPrototypes["Door"].SetParameter("openingState", 0);
+        _installedObjectPrototypes["Door"].RegisterUpdateAction(InstalledObjectAction.Door_UpdateAction);
         _installedObjectPrototypes["Door"]._checkEnterableState = InstalledObjectAction.Door_EnterableState;
     }
 

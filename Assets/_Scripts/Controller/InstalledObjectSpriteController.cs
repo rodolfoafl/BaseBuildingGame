@@ -163,25 +163,20 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         //Change Door sprite alpha to simulate opening/closing
         if (obj.ObjectType == "Door")
         {
-            //var color = inst_go.GetComponent<SpriteRenderer>().color;
-            if (obj._installedObjectParameters["openness"] < 0.1f)
+            if (obj.GetParameter("openness") < 0.1f)
             {
-                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 1f);
                 inst_go.GetComponent<SpriteRenderer>().DOFade(1f, 0.25f);
             }
-            else if (obj._installedObjectParameters["openness"] < 0.5f)
+            else if (obj.GetParameter("openness") < 0.5f)
             {
-                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.66f);
                 inst_go.GetComponent<SpriteRenderer>().DOFade(0.66f, 0.25f);
             }
-            else if (obj._installedObjectParameters["openness"] < 0.9f)
+            else if (obj.GetParameter("openness") < 0.9f)
             {
-                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.33f);
                 inst_go.GetComponent<SpriteRenderer>().DOFade(0.33f, 0.25f);
             }
             else
             {
-                //inst_go.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0f);
                 inst_go.GetComponent<SpriteRenderer>().DOFade(0f, 0.25f);
             }
         }
