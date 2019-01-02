@@ -17,7 +17,7 @@ public class Tile {
 
     Action<Tile> _cbTileChanged;
 
-    LooseObject _looseObject;
+    LooseObject _looseObject; 
 
     InstalledObject _installedObject;
 
@@ -134,6 +134,19 @@ public class Tile {
             _room = value;
         }
     }
+
+    public LooseObject LooseObject
+    {
+        get
+        {
+            return _looseObject;
+        }
+
+        set
+        {
+            _looseObject = value;
+        }
+    }
     #endregion
 
     public Tile( World world, int x, int y)
@@ -158,6 +171,39 @@ public class Tile {
         }
 
         _installedObject = objInstance;
+        return true;
+    }
+
+    public bool AssignLooseObject(LooseObject objInstance)
+    {
+        if(objInstance == null)
+        {
+            _looseObject = null;
+            return true;
+        }
+
+        if(_looseObject != null)
+        {
+            if(_looseObject.ObjectType != objInstance.ObjectType)
+            {
+                Debug.LogError("Different looseObject type. Can't assign it to the tile!");
+                return false;
+            }
+
+            int quantToMove = objInstance.StackSize;
+            if(_looseObject.StackSize + quantToMove > _looseObject.MaxStackSize)
+            {
+                quantToMove = _looseObject.MaxStackSize - _looseObject.StackSize;
+            }
+
+            _looseObject.StackSize += quantToMove;
+            objInstance.StackSize -= quantToMove;
+            return true;
+        }
+
+        _looseObject = objInstance.Clone();
+        _looseObject.Tile = this;
+        objInstance.StackSize = 0;
         return true;
     }
 
@@ -241,51 +287,6 @@ public class Tile {
         return EnterableState.Yes;
     }
     
-    /*
-    #region Get Neighbour Methods
-    public Tile GetNorthNeighbour()
-    {
-        return World.GetTileAt(X, Y + 1);
-    }
-
-    public Tile GetSouthNeighbour()
-    {
-        return World.GetTileAt(X, Y - 1);
-    }
-
-    public Tile GetEastNeighbour()
-    {
-        return World.GetTileAt(X + 1, Y);
-    }
-
-    public Tile GetWestNeighbour()
-    {
-        return World.GetTileAt(X - 1, Y);
-    }
-
-    public Tile GetNorthEastNeighbour()
-    {
-        return World.GetTileAt(X + 1, Y + 1);
-    }
-
-    public Tile GetNorthWestNeighbour()
-    {
-        return World.GetTileAt(X - 1, Y + 1);
-    }
-
-    public Tile GetSouthEasthNeighbour()
-    {
-        return World.GetTileAt(X + 1, Y - 1);
-    }
-
-    public Tile GetSouthWestNeighbour()
-    {
-        return World.GetTileAt(X - 1, Y - 1);
-    }
-    #endregion
-    */
-
-
     #region Callbacks
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)
     {

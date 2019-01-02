@@ -126,7 +126,7 @@ public class InstalledObject: IXmlSerializable{
         this._checkEnterableState = other._checkEnterableState;
     }
 
-    virtual public InstalledObject Clone()
+    public virtual InstalledObject Clone()
     {
         return new InstalledObject(this);
     }

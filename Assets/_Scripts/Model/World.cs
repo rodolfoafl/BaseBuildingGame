@@ -14,6 +14,8 @@ public class World : IXmlSerializable{
     List<InstalledObject> _installedObjects;
     List<Room> _rooms;
 
+    LooseObjectManager _looseObjectManager;
+
     Path_TileGraph _tileGraph;
 
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
@@ -21,6 +23,7 @@ public class World : IXmlSerializable{
     Action<InstalledObject> _cbInstalledObjectCreated;
     Action<Character> _cbCharacterCreated;
     Action<Tile> _cbTileChanged;
+    Action<LooseObject> _cbLooseObjectCreated;
 
     JobQueue _jobQueue;
 
@@ -98,34 +101,26 @@ public class World : IXmlSerializable{
             _rooms = value;
         }
     }
+
+    public LooseObjectManager LooseObjectManager
+    {
+        get
+        {
+            return _looseObjectManager;
+        }
+
+        set
+        {
+            _looseObjectManager = value;
+        }
+    }
     #endregion
 
     public World(int width, int height)
     {
         SetupNewWorld(width, height);
 
-        Character character = CreateCharacter(GetTileAt(width / 2, height / 2));
-    }
-
-    public Room GetOutsideRoom()
-    {
-        return _rooms[0];
-    }
-
-    public void DeleteRoom(Room room)
-    {
-        if(room == GetOutsideRoom())
-        {
-            Debug.LogError("Tried to delete the outside room!");
-            return;
-        }
-        _rooms.Remove(room);
-        room.UnassingnAllTiles();        
-    }
-
-    public void AddRoom(Room room)
-    {
-        _rooms.Add(room);
+        CreateCharacter(GetTileAt(width / 2, height / 2));
     }
 
     void SetupNewWorld(int width, int height)
@@ -156,6 +151,7 @@ public class World : IXmlSerializable{
 
         _characters = new List<Character>();
         _installedObjects = new List<InstalledObject>();
+        _looseObjectManager = new LooseObjectManager();
     }
 
     public void Update(float deltaTime)
@@ -228,7 +224,6 @@ public class World : IXmlSerializable{
         return _tiles[x, y];
     }
 
-    //Assumes 1x1 tiles.
     public InstalledObject PlaceInstalledObject(string objectType, Tile tile)
     {
         InstalledObject instObj;
@@ -317,6 +312,29 @@ public class World : IXmlSerializable{
         }
     }
 
+    #region Room Related Methods
+    public Room GetOutsideRoom()
+    {
+        return _rooms[0];
+    }
+
+    public void DeleteRoom(Room room)
+    {
+        if (room == GetOutsideRoom())
+        {
+            Debug.LogError("Tried to delete the outside room!");
+            return;
+        }
+        _rooms.Remove(room);
+        room.UnassingnAllTiles();
+    }
+
+    public void AddRoom(Room room)
+    {
+        _rooms.Add(room);
+    }
+    #endregion
+
     #region Callbacks
     public void RegisterInstalledObjectCreated(Action<InstalledObject> callback)
     {
@@ -347,10 +365,20 @@ public class World : IXmlSerializable{
     {
         _cbCharacterCreated -= callback;
     }
+
+    public void RegisterLooseObjectCreated(Action<LooseObject> callback)
+    {
+        _cbLooseObjectCreated += callback;
+    }
+
+    public void UnregisterLooseObjectCreated(Action<LooseObject> callback)
+    {
+        _cbLooseObjectCreated -= callback;
+    }
     #endregion
 
     #region Saving & Loading
-    
+
     public World()
     {
 
@@ -427,6 +455,16 @@ public class World : IXmlSerializable{
                 default:
                     break;
             }
+        }
+
+        //TEST ONLY!
+        //Create an LooseObject Item
+        LooseObject looseObject = new LooseObject();
+        Tile tile = GetTileAt(Width / 2, Height / 2);
+        _looseObjectManager.PlaceLooseObject(tile, looseObject);
+        if(_cbLooseObjectCreated != null)
+        {
+            _cbLooseObjectCreated(tile.LooseObject);
         }
     }
 
