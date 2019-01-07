@@ -46,7 +46,7 @@ public class MouseController : MonoBehaviour {
 
     public Tile GetMouseOverTile()
     {
-        return WorldController.Instance.World.GetTileAt(Mathf.FloorToInt(_currFramePosition.x), Mathf.FloorToInt(_currFramePosition.y));
+        return WorldController.Instance.GetTileAtWorldCoordinate(_currFramePosition);
     }
 
     #region Mouse Related Methods
@@ -63,8 +63,8 @@ public class MouseController : MonoBehaviour {
             _dragStartPosition = _currFramePosition;
         }
 
-        int start_x = Mathf.FloorToInt(_dragStartPosition.x);
-        int end_x = Mathf.FloorToInt(_currFramePosition.x);
+        int start_x = Mathf.RoundToInt(_dragStartPosition.x);
+        int end_x = Mathf.RoundToInt(_currFramePosition.x);
         if (end_x < start_x)
         {
             int tmp = end_x;
@@ -72,8 +72,8 @@ public class MouseController : MonoBehaviour {
             start_x = tmp;
         }
 
-        int start_y = Mathf.FloorToInt(_dragStartPosition.y);
-        int end_y = Mathf.FloorToInt(_currFramePosition.y);
+        int start_y = Mathf.RoundToInt(_dragStartPosition.y);
+        int end_y = Mathf.RoundToInt(_currFramePosition.y);
         if (end_y < start_y)
         {
             int tmp = end_y;

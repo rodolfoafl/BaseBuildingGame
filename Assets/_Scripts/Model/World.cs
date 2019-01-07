@@ -460,6 +460,7 @@ public class World : IXmlSerializable{
         //TEST ONLY!
         //Create an LooseObject Item
         LooseObject looseObject = new LooseObject();
+        looseObject.StackSize = 10;
         Tile tile = GetTileAt(Width / 2, Height / 2);
         _looseObjectManager.PlaceLooseObject(tile, looseObject);
         if(_cbLooseObjectCreated != null)

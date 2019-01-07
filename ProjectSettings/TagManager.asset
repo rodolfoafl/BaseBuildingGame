@@ -53,3 +53,6 @@ TagManager:
   - name: Characters
     uniqueID: 3823119035
     locked: 0
+  - name: LooseObjectsUI
+    uniqueID: 4038583019
+    locked: 0

@@ -107,8 +107,8 @@ public class WorldController : MonoBehaviour {
 
     public Tile GetTileAtWorldCoordinate(Vector3 coordinate)
     {
-        int x = Mathf.FloorToInt(coordinate.x);
-        int y = Mathf.FloorToInt(coordinate.y);
+        int x = Mathf.RoundToInt(coordinate.x);
+        int y = Mathf.RoundToInt(coordinate.y);
 
         return Instance.World.GetTileAt(x, y);
     }

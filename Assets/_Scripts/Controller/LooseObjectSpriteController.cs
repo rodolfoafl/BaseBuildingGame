@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LooseObjectSpriteController : MonoBehaviour {
+
+    [SerializeField] GameObject _looseObjectUIPrefab;
 
     Dictionary<LooseObject, GameObject> _looseObjectGameObjectMap;
     Dictionary<string, Sprite> _stringLooseObjectSpritesMap;
@@ -52,6 +55,14 @@ public class LooseObjectSpriteController : MonoBehaviour {
         SpriteRenderer sr = obj_go.AddComponent<SpriteRenderer>();
         sr.sprite = _stringLooseObjectSpritesMap[obj.ObjectType];
         sr.sortingLayerName = "LooseObjects";
+
+        if(obj.MaxStackSize > 1)
+        {
+            GameObject ui_go = Instantiate(_looseObjectUIPrefab);
+            ui_go.transform.SetParent(obj_go.transform);
+            ui_go.transform.localPosition = Vector3.zero;
+            ui_go.GetComponentInChildren<Text>().text = obj.StackSize.ToString();
+        }
     }
 
     void OnLooseObjectChanged(LooseObject obj)
