@@ -14,12 +14,19 @@ public class Job {
     Action<Job> _cbJobCompleted;
     Action<Job> _cbJobCancelled;
 
+    Dictionary<string, LooseObject> _looseObjectRequeriments;
+
     #region Properties
     public Tile Tile
     {
         get
         {
             return _tile;
+        }
+
+        set
+        {
+            _tile = value;
         }
     }
 
@@ -35,14 +42,97 @@ public class Job {
             _jobObjectType = value;
         }
     }
+
+    public float JobTime
+    {
+        get
+        {
+            return _jobTime;
+        }
+
+        set
+        {
+            _jobTime = value;
+        }
+    }
+
+    public Action<Job> CbJobCompleted
+    {
+        get
+        {
+            return _cbJobCompleted;
+        }
+
+        set
+        {
+            _cbJobCompleted = value;
+        }
+    }
+
+    public Action<Job> CbJobCancelled
+    {
+        get
+        {
+            return _cbJobCancelled;
+        }
+
+        set
+        {
+            _cbJobCancelled = value;
+        }
+    }
+
+    public Dictionary<string, LooseObject> LooseObjectRequeriments
+    {
+        get
+        {
+            return _looseObjectRequeriments;
+        }
+
+        set
+        {
+            _looseObjectRequeriments = value;
+        }
+    }
     #endregion
 
-    public Job(Tile tile, string jobObjectType, Action<Job> cbJobCompleted, float jobTime = .1f)
+    public Job(Tile tile, string jobObjectType, Action<Job> cbJobCompleted, float jobTime, LooseObject[] looseObjects)
     {
         this._tile = tile;
         this._jobObjectType = jobObjectType;
         this._cbJobCompleted += cbJobCompleted;
         this._jobTime = jobTime;
+
+        this._looseObjectRequeriments = new Dictionary<string, LooseObject>();
+        if(_looseObjectRequeriments != null)
+        {
+            foreach (LooseObject obj in _looseObjectRequeriments.Values)
+            {
+                this._looseObjectRequeriments[obj.ObjectType] = obj.Clone();
+            }
+        }
+    }
+
+    protected Job(Job other)
+    {
+        this._tile = other.Tile;
+        this._jobObjectType = other.JobObjectType;
+        this._cbJobCompleted += other.CbJobCompleted;
+        this._jobTime = other.JobTime;
+
+        this._looseObjectRequeriments = new Dictionary<string, LooseObject>();
+        if (_looseObjectRequeriments != null)
+        {
+            foreach (LooseObject obj in other.LooseObjectRequeriments.Values)
+            {
+                this._looseObjectRequeriments[obj.ObjectType] = obj.Clone();
+            }
+        }
+    }
+
+    public virtual Job Clone()
+    {
+        return new Job(this);
     }
 
     public void WorkOnJob(float workTime)

@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 public class BuildModeController : MonoBehaviour {
 
+    World _world;
+
     bool _buildModeIsObject = false;
     string _buildModeObjectType;
     TileType _buildModeTile = TileType.Floor;    
@@ -30,27 +32,37 @@ public class BuildModeController : MonoBehaviour {
 
     public void SetupPathfinding()
     {
-        WorldController.Instance.World.SetupPathfindingExample();
+        _world.SetupPathfindingExample();
     }
     #endregion
 
     public void Build(Tile tile)
     {
+        _world = WorldController.Instance.World;
+
         if (_buildModeIsObject)
         {
             string installedObjectType = _buildModeObjectType;
-            if (WorldController.Instance.World.IsInstalledObjectPlacementValid(installedObjectType, tile)
+            if (_world.IsInstalledObjectPlacementValid(installedObjectType, tile)
                 && tile.PendingInstalledObjectJob == null)
             {
-                Job newJob = new Job(tile, installedObjectType, (theJob) => {
-                    OnInstalledObjectJobCompleted(installedObjectType, theJob.Tile);
-                    tile.PendingInstalledObjectJob = null;
-                });
+                Job newJob;
+
+                if (_world.InstalledObjectJobPrototypes.ContainsKey(installedObjectType))
+                {
+                    newJob = _world.InstalledObjectJobPrototypes[installedObjectType].Clone();
+                    newJob.Tile = tile;
+                }
+                else
+                {
+                    Debug.LogError("There is no installedObject job prototype for: " + installedObjectType);
+                    newJob = new Job(tile, installedObjectType, InstalledObjectAction.OnInstalledObjectJobCompleted, 0.1f, null);
+                }
 
                 tile.PendingInstalledObjectJob = newJob;
                 newJob.RegisterJobCancelledCallback((theJob) => { theJob.Tile.PendingInstalledObjectJob = null; });
 
-                WorldController.Instance.World.JobQueue.Enqueue(newJob);
+                _world.JobQueue.Enqueue(newJob);
                 //Debug.Log("JobQueue size: " + WorldController.Instance.World.JobQueue.Count);
             }
         }
@@ -59,10 +71,4 @@ public class BuildModeController : MonoBehaviour {
             tile.Type = _buildModeTile;
         }
     }
-
-    void OnInstalledObjectJobCompleted(string objectType, Tile tile)
-    {
-        WorldController.Instance.World.PlaceInstalledObject(_buildModeObjectType, tile);
-    }
-
 }

@@ -38,4 +38,10 @@ public static class InstalledObjectAction {
         }
         return EnterableState.Soon;
     }
+
+    public static void OnInstalledObjectJobCompleted(Job job)
+    {
+        WorldController.Instance.World.PlaceInstalledObject(job.JobObjectType, job.Tile);
+        job.Tile.PendingInstalledObjectJob = null;
+    }
 }

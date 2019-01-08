@@ -19,6 +19,7 @@ public class World : IXmlSerializable{
     Path_TileGraph _tileGraph;
 
     Dictionary<string, InstalledObject> _installedObjectPrototypes;
+    Dictionary<string, Job> _installedObjectJobPrototypes;
     
     Action<InstalledObject> _cbInstalledObjectCreated;
     Action<Character> _cbCharacterCreated;
@@ -114,6 +115,19 @@ public class World : IXmlSerializable{
             _looseObjectManager = value;
         }
     }
+
+    public Dictionary<string, Job> InstalledObjectJobPrototypes
+    {
+        get
+        {
+            return _installedObjectJobPrototypes;
+        }
+
+        set
+        {
+            _installedObjectJobPrototypes = value;
+        }
+    }
     #endregion
 
     public World(int width, int height)
@@ -182,9 +196,11 @@ public class World : IXmlSerializable{
     void InitializeInstalledObjectPrototypesDictionary()
     {
         _installedObjectPrototypes = new Dictionary<string, InstalledObject>();
+        _installedObjectJobPrototypes = new Dictionary<string, Job>();
 
         InstalledObject wallPrototype =  new InstalledObject("Wall", 0, 1, 1, true, true);
         _installedObjectPrototypes.Add("Wall", wallPrototype);
+        _installedObjectJobPrototypes.Add("Wall", new Job(null, "Wall", InstalledObjectAction.OnInstalledObjectJobCompleted, 1f, new LooseObject[] { new LooseObject("SteelPlate_", 5, 0) }));
 
         InstalledObject doorPrototype = new InstalledObject("Door", 1, 1, 1, false, true);
         _installedObjectPrototypes.Add("Door", doorPrototype);
