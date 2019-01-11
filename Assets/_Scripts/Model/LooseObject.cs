@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ public class LooseObject {
 
     Tile _tile;
     Character _character;
+
+    Action<LooseObject> _cbLooseObjectChanged;
 
     #region Properties
     public string ObjectType
@@ -48,7 +51,14 @@ public class LooseObject {
 
         set
         {
-            _stackSize = value;
+            if(_stackSize != value)
+            {
+                _stackSize = value;
+                if(_cbLooseObjectChanged != null)
+                {
+                    _cbLooseObjectChanged(this);
+                }
+            }
         }
     }
 
@@ -84,6 +94,11 @@ public class LooseObject {
 
     }
 
+    public virtual LooseObject Clone()
+    {
+        return new LooseObject(this);
+    }
+
     public LooseObject(string objectType, int maxStackSize, int stackSize)
     {
         this._objectType = objectType;
@@ -98,8 +113,15 @@ public class LooseObject {
         this._stackSize = other._stackSize;
     }
 
-    public virtual LooseObject Clone()
+    #region Callbacks
+    public void RegisterLooseObjectChangedCallback(Action<LooseObject> callback)
     {
-        return new LooseObject(this);
+        _cbLooseObjectChanged += callback;
     }
+
+    public void UnregisterLooseObjectChangedCallback(Action<LooseObject> callback)
+    {
+        _cbLooseObjectChanged -= callback;
+    }
+    #endregion
 }

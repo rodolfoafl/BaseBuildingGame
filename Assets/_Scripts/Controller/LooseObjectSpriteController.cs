@@ -63,6 +63,8 @@ public class LooseObjectSpriteController : MonoBehaviour {
             ui_go.transform.localPosition = Vector3.zero;
             ui_go.GetComponentInChildren<Text>().text = obj.StackSize.ToString();
         }
+
+        obj.RegisterLooseObjectChangedCallback(OnLooseObjectChanged);
     }
 
     void OnLooseObjectChanged(LooseObject obj)
@@ -73,6 +75,11 @@ public class LooseObjectSpriteController : MonoBehaviour {
             Debug.LogError("_looseObjectGameObjectMap doesn't contain the looseObject!");
             return;
         }
-        obj_go.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0f);
+        //obj_go.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0f);
+        Text text = obj_go.GetComponentInChildren<Text>();
+        if(text != null)
+        {
+            text.text = obj.StackSize.ToString();
+        }
     }
 }

@@ -96,6 +96,11 @@ public class Job {
     }
     #endregion
 
+    public virtual Job Clone()
+    {
+        return new Job(this);
+    }
+
     public Job(Tile tile, string jobObjectType, Action<Job> cbJobCompleted, float jobTime, LooseObject[] looseObjects)
     {
         this._tile = tile;
@@ -106,7 +111,7 @@ public class Job {
         this._looseObjectRequeriments = new Dictionary<string, LooseObject>();
         if(_looseObjectRequeriments != null)
         {
-            foreach (LooseObject obj in _looseObjectRequeriments.Values)
+            foreach (LooseObject obj in looseObjects)
             {
                 this._looseObjectRequeriments[obj.ObjectType] = obj.Clone();
             }
@@ -130,11 +135,6 @@ public class Job {
         }
     }
 
-    public virtual Job Clone()
-    {
-        return new Job(this);
-    }
-
     public void WorkOnJob(float workTime)
     {
         _jobTime -= workTime;
@@ -153,6 +153,45 @@ public class Job {
         {
             _cbJobCancelled(this);
         }
+    }
+
+    public bool HasAllMaterials()
+    {
+        foreach (LooseObject obj in _looseObjectRequeriments.Values)
+        {
+            if (obj.MaxStackSize > obj.StackSize)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int RequiredLooseObjectAmount(LooseObject obj)
+    {
+        if (!_looseObjectRequeriments.ContainsKey(obj.ObjectType))
+        {
+            return 0;
+        }
+
+        if(_looseObjectRequeriments[obj.ObjectType].StackSize >= _looseObjectRequeriments[obj.ObjectType].MaxStackSize)
+        {
+            return 0;
+        }
+
+        return _looseObjectRequeriments[obj.ObjectType].MaxStackSize - _looseObjectRequeriments[obj.ObjectType].StackSize;
+    }
+
+    public LooseObject GetFirstRequiredLooseObject()
+    {
+        foreach (LooseObject obj in _looseObjectRequeriments.Values)
+        {
+            if (obj.MaxStackSize > obj.StackSize)
+            {
+                return obj;
+            }
+        }
+        return null;
     }
 
     #region Callbacks
