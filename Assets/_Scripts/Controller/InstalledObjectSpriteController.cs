@@ -61,6 +61,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
         instObj.AddComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
         instObj.GetComponent<SpriteRenderer>().sortingLayerName = "InstalledObjects";
+        instObj.GetComponent<SpriteRenderer>().color = obj.Tint;
 
         obj.RegisterOnInstalledObjectChangedCallback(OnInstalledObjectChanged);
     }
@@ -158,6 +159,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
             return;
         }
         inst_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
+        inst_go.GetComponent<SpriteRenderer>().color = obj.Tint;
 
         //Change Door sprite alpha to simulate opening/closing
         if (obj.ObjectType == "Door")

@@ -130,7 +130,10 @@ public class Character: IXmlSerializable {
                     if (_currentTile == _myJob.Tile)
                     {
                         WorldController.Instance.World.LooseObjectManager.PlaceLooseObject(_myJob, _looseObject);
-                        if(_looseObject.StackSize == 0)
+
+                        _myJob.WorkOnJob(0);
+
+                        if (_looseObject.StackSize == 0)
                         {
                             _looseObject = null;
                         }
@@ -157,7 +160,9 @@ public class Character: IXmlSerializable {
             }
             else
             {
-                if(_currentTile.LooseObject != null && _myJob.RequiredLooseObjectAmount(_currentTile.LooseObject) > 0)
+                if(_currentTile.LooseObject != null 
+                    && (_myJob.CanFetchFromStockpile || _currentTile.InstalledObject == null || !_currentTile.InstalledObject.IsStockpileJob()) 
+                    && _myJob.RequiredLooseObjectAmount(_currentTile.LooseObject) > 0)
                 {
                     WorldController.Instance.World.LooseObjectManager.PlaceLooseObject(this, _currentTile.LooseObject, _myJob.RequiredLooseObjectAmount(_currentTile.LooseObject));
                 }
@@ -166,11 +171,11 @@ public class Character: IXmlSerializable {
                     LooseObject required = _myJob.GetFirstRequiredLooseObject();
                     if (required != null)
                     {
-                        LooseObject supplier = WorldController.Instance.World.LooseObjectManager.GetClosestLooseObjectOfType(required.ObjectType, _currentTile, required.MaxStackSize - required.StackSize);
+                        LooseObject supplier = WorldController.Instance.World.LooseObjectManager.GetClosestLooseObjectOfType(required.ObjectType, _currentTile, required.MaxStackSize - required.StackSize, _myJob.CanFetchFromStockpile);
 
                         if (supplier == null)
                         {
-                            Debug.Log("No tile contains object of type '" + required.ObjectType + "'!");
+                            //Debug.Log("No tile contains object of type '" + required.ObjectType + "'!");
                             AbandonJob();
                             return;
                         }
@@ -302,6 +307,9 @@ public class Character: IXmlSerializable {
 
     void RegisterOnJobEnded(Job job)
     {
+        job.UnregisterJobCancelledCallback(RegisterOnJobEnded);
+        job.UnregisterJobCompletedCallback(RegisterOnJobEnded);
+
         if(job != _myJob)
         {
             Debug.LogError("Character being told about job that isn't his!");

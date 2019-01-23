@@ -128,6 +128,19 @@ public class World : IXmlSerializable{
             _installedObjectJobPrototypes = value;
         }
     }
+
+    public Action<LooseObject> CbLooseObjectCreated
+    {
+        get
+        {
+            return _cbLooseObjectCreated;
+        }
+
+        set
+        {
+            _cbLooseObjectCreated = value;
+        }
+    }
     #endregion
 
     public World(int width, int height)
@@ -209,6 +222,12 @@ public class World : IXmlSerializable{
         _installedObjectPrototypes["Door"].SetParameter("openingState", 0);
         _installedObjectPrototypes["Door"].RegisterUpdateAction(InstalledObjectAction.Door_UpdateAction);
         _installedObjectPrototypes["Door"]._checkEnterableState = InstalledObjectAction.Door_EnterableState;
+
+        InstalledObject stockPilePrototype = new InstalledObject("Stockpile", 1, 1, 1, true, false);
+        _installedObjectPrototypes.Add("Stockpile", stockPilePrototype);
+        _installedObjectPrototypes["Stockpile"].RegisterUpdateAction(InstalledObjectAction.Stockpile_UpdateAction);
+        _installedObjectPrototypes["Stockpile"].Tint = new Color(1f, 0f, 0f, 1f);
+        _installedObjectJobPrototypes.Add("Stockpile", new Job(null, "Stockpile", InstalledObjectAction.OnInstalledObjectJobCompleted, -1f, null));
     }
 
     public void RandomizeTiles()
@@ -325,6 +344,14 @@ public class World : IXmlSerializable{
                     }
                 }
             }
+        }
+    }
+
+    public void OnLooseObjectCreated(LooseObject obj)
+    {
+        if(_cbLooseObjectCreated != null)
+        {
+            _cbLooseObjectCreated(obj);
         }
     }
 
@@ -475,11 +502,18 @@ public class World : IXmlSerializable{
 
         //TEST ONLY!
         //Create an LooseObject Item
-        LooseObject looseObject = new LooseObject();
-        looseObject.StackSize = 10;
-        Tile tile = GetTileAt(Width / 2, Height / 2);
+        LooseObject looseObject = new LooseObject("SteelPlate_", 50, 10);
+        Tile tile = GetTileAt(Width / 2 + 4, Height / 2);
         _looseObjectManager.PlaceLooseObject(tile, looseObject);
         if(_cbLooseObjectCreated != null)
+        {
+            _cbLooseObjectCreated(tile.LooseObject);
+        }
+
+        looseObject = new LooseObject("SteelPlate_", 50, 20);
+        tile = GetTileAt(Width / 2 + 4, Height / 2 + 4);
+        _looseObjectManager.PlaceLooseObject(tile, looseObject);
+        if (_cbLooseObjectCreated != null)
         {
             _cbLooseObjectCreated(tile.LooseObject);
         }

@@ -76,10 +76,20 @@ public class LooseObjectSpriteController : MonoBehaviour {
             return;
         }
         //obj_go.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0f);
-        Text text = obj_go.GetComponentInChildren<Text>();
-        if(text != null)
+
+        if (obj.StackSize > 0)
         {
-            text.text = obj.StackSize.ToString();
+            Text text = obj_go.GetComponentInChildren<Text>();
+            if (text != null)
+            {
+                text.text = obj.StackSize.ToString();
+            }
+        }
+        else
+        {
+            Destroy(obj_go);
+            _looseObjectGameObjectMap.Remove(obj);
+            obj.UnregisterLooseObjectChangedCallback(OnLooseObjectChanged);
         }
     }
 }

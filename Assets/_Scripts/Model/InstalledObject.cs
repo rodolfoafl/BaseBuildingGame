@@ -39,6 +39,10 @@ public class InstalledObject: IXmlSerializable{
 
     Func <Tile, bool> funcPositionValidation;
 
+    List<Job> _jobs;
+
+    Color _tint = Color.white;
+
     #region Properties
     public string ObjectType
     {
@@ -106,6 +110,32 @@ public class InstalledObject: IXmlSerializable{
             _roomEnclosure = value;
         }
     }
+
+    public List<Job> Jobs
+    {
+        get
+        {
+            return _jobs;
+        }
+
+        set
+        {
+            _jobs = value;
+        }
+    }
+
+    public Color Tint
+    {
+        get
+        {
+            return _tint;
+        }
+
+        set
+        {
+            _tint = value;
+        }
+    }
     #endregion
 
     protected InstalledObject(InstalledObject other)
@@ -116,7 +146,9 @@ public class InstalledObject: IXmlSerializable{
         this._width = other._width;
         this._height = other._height;
         this._linksToNeighbor = other._linksToNeighbor;
+        this._tint = other._tint;
 
+        this._jobs = new List<Job>();
         this._installedObjectParameters = new Dictionary<string, float>(other._installedObjectParameters);
         if (other._updateActions != null)
         {
@@ -144,6 +176,7 @@ public class InstalledObject: IXmlSerializable{
         this.funcPositionValidation = this._IsValidPosition;
 
         this._installedObjectParameters = new Dictionary<string, float>();
+        this._jobs = new List<Job>();
     }
 
     public static InstalledObject PlaceInstance(InstalledObject proto, Tile tile)
@@ -239,6 +272,39 @@ public class InstalledObject: IXmlSerializable{
         _installedObjectParameters[key] += value;
     }
 
+
+    public int JobCount()
+    {
+        return _jobs.Count;
+    }
+
+    public void AddJob(Job job)
+    {
+        _jobs.Add(job);
+        WorldController.Instance.World.JobQueue.Enqueue(job);
+    }
+
+    public void RemoveJob(Job job)
+    {
+        _jobs.Remove(job);
+        job.CancelJob();
+        WorldController.Instance.World.JobQueue.Remove(job);
+    }
+
+    public void ClearJobs()
+    {
+        foreach(Job j in _jobs)
+        {
+            RemoveJob(j);
+        }
+    }
+
+    public bool IsStockpileJob()
+    {
+        return _objectType == "Stockpile";
+    }
+
+    #region Callbacks
     public void RegisterUpdateAction(Action<InstalledObject, float> action)
     {
         _updateActions += action;
@@ -249,7 +315,6 @@ public class InstalledObject: IXmlSerializable{
         _updateActions -= action;
     }
 
-    #region Callbacks
     public void RegisterOnInstalledObjectChangedCallback(Action<InstalledObject> callback)
     {
         _cbOnInstalledObjectChanged += callback;
@@ -265,6 +330,7 @@ public class InstalledObject: IXmlSerializable{
     public InstalledObject()
     {
         _installedObjectParameters = new Dictionary<string, float>();
+        _jobs = new List<Job>();
     }
 
     public XmlSchema GetSchema()

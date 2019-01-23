@@ -9,10 +9,14 @@ public class Job {
 
     float _jobTime;
 
-    string _jobObjectType; 
+    string _jobObjectType;
+
+    bool _acceptsAnyLooseObjectItem = false;
+    bool _canFetchFromStockpile = true;
 
     Action<Job> _cbJobCompleted;
     Action<Job> _cbJobCancelled;
+    Action<Job> _cbJobProgressed;
 
     Dictionary<string, LooseObject> _looseObjectRequeriments;
 
@@ -94,6 +98,32 @@ public class Job {
             _looseObjectRequeriments = value;
         }
     }
+
+    public bool AcceptsAnyLooseObjectItem
+    {
+        get
+        {
+            return _acceptsAnyLooseObjectItem;
+        }
+
+        set
+        {
+            _acceptsAnyLooseObjectItem = value;
+        }
+    }
+
+    public bool CanFetchFromStockpile
+    {
+        get
+        {
+            return _canFetchFromStockpile;
+        }
+
+        set
+        {
+            _canFetchFromStockpile = value;
+        }
+    }
     #endregion
 
     public virtual Job Clone()
@@ -109,7 +139,7 @@ public class Job {
         this._jobTime = jobTime;
 
         this._looseObjectRequeriments = new Dictionary<string, LooseObject>();
-        if(_looseObjectRequeriments != null)
+        if(looseObjects != null)
         {
             foreach (LooseObject obj in looseObjects)
             {
@@ -126,7 +156,7 @@ public class Job {
         this._jobTime = other.JobTime;
 
         this._looseObjectRequeriments = new Dictionary<string, LooseObject>();
-        if (_looseObjectRequeriments != null)
+        if (other.LooseObjectRequeriments != null)
         {
             foreach (LooseObject obj in other.LooseObjectRequeriments.Values)
             {
@@ -137,7 +167,23 @@ public class Job {
 
     public void WorkOnJob(float workTime)
     {
+        if (!HasAllMaterials())
+        {
+            //Debug.LogError("Tried to do work on a job that doesn't have all the materials!");
+            if(_cbJobProgressed != null)
+            {
+                _cbJobProgressed(this);
+            }
+            return;
+        }
+
         _jobTime -= workTime;
+
+        if(_cbJobProgressed != null)
+        {
+            _cbJobProgressed(this);
+        }
+
         if (_jobTime <= 0)
         {
             if (_cbJobCompleted != null)
@@ -153,6 +199,8 @@ public class Job {
         {
             _cbJobCancelled(this);
         }
+
+        WorldController.Instance.World.JobQueue.Remove(this);
     }
 
     public bool HasAllMaterials()
@@ -169,6 +217,11 @@ public class Job {
 
     public int RequiredLooseObjectAmount(LooseObject obj)
     {
+        if (_acceptsAnyLooseObjectItem)
+        {
+            return obj.MaxStackSize;
+        }
+
         if (!_looseObjectRequeriments.ContainsKey(obj.ObjectType))
         {
             return 0;
@@ -200,19 +253,29 @@ public class Job {
         _cbJobCompleted += callback;
     }
 
-    public void RegisterJobCancelledCallback(Action<Job> callback)
-    {
-        _cbJobCancelled += callback;
-    }
-
     public void UnregisterJobCompletedCallback(Action<Job> callback)
     {
         _cbJobCompleted -= callback;
     }
 
+    public void RegisterJobCancelledCallback(Action<Job> callback)
+    {
+        _cbJobCancelled += callback;
+    }   
+
     public void UnregisterJobCancelledCallback(Action<Job> callback)
     {
         _cbJobCancelled -= callback;
+    }
+
+    public void RegisterJobProgressedCallback(Action<Job> callback)
+    {
+        _cbJobProgressed += callback;
+    }
+
+    public void UnregisterJobProgressedCallback(Action<Job> callback)
+    {
+        _cbJobProgressed -= callback;
     }
     #endregion
 }

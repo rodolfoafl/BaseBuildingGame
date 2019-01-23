@@ -64,6 +64,8 @@ public class LooseObjectManager {
                 _stringLooseObjectMap[tile.LooseObject.ObjectType] = new List<LooseObject>(); 
             }
             _stringLooseObjectMap[tile.LooseObject.ObjectType].Add(tile.LooseObject);
+
+            tile.World.OnLooseObjectCreated(tile.LooseObject);
         }
         return true;
     }
@@ -99,6 +101,10 @@ public class LooseObjectManager {
         {
             amount = obj.StackSize;
         }
+        else
+        {
+            amount = Mathf.Min(amount, obj.StackSize);
+        }
 
         if(character.LooseObject == null)
         {
@@ -130,7 +136,7 @@ public class LooseObjectManager {
     }
 
 
-    public LooseObject GetClosestLooseObjectOfType(string objectType, Tile tile, int requiredAmount)
+    public LooseObject GetClosestLooseObjectOfType(string objectType, Tile tile, int requiredAmount, bool canFetchFromStockpile)
     {
         if (!_stringLooseObjectMap.ContainsKey(objectType))
         {
@@ -140,7 +146,8 @@ public class LooseObjectManager {
 
         foreach(LooseObject obj in _stringLooseObjectMap[objectType])
         {
-            if(obj.Tile != null)
+            if(obj.Tile != null 
+                && (canFetchFromStockpile || obj.Tile.InstalledObject == null || !obj.Tile.InstalledObject.IsStockpileJob()))
             {
                 return obj;
             }

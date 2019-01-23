@@ -15,6 +15,12 @@ public class JobQueue {
 
     public void Enqueue(Job job)
     {
+        if(job.JobTime < 0)
+        {
+            job.WorkOnJob(0);
+            return;
+        }
+
         _jobQueue.Enqueue(job);
 
         if(_cbJobCreated != null)
@@ -35,6 +41,20 @@ public class JobQueue {
         }
     }
 
+    public void Remove(Job job)
+    {
+        if (!_jobQueue.Contains(job))
+        {
+            //Debug.LogError("Trying to remove a job that doesn't exist on the queue!");
+            return;
+        }
+
+        List<Job> jobs = new List<Job>(_jobQueue);
+        jobs.Remove(job);
+        _jobQueue = new Queue<Job>(jobs);
+    }
+
+    #region Callbacks
     public void RegisterJobCreationCallback(Action<Job> callback)
     {
         _cbJobCreated += callback;
@@ -44,5 +64,5 @@ public class JobQueue {
     {
         _cbJobCreated -= callback;
     }
-
+    #endregion
 }
