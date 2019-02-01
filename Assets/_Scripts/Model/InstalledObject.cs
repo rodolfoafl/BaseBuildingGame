@@ -136,6 +136,32 @@ public class InstalledObject: IXmlSerializable{
             _tint = value;
         }
     }
+
+    public int Width
+    {
+        get
+        {
+            return _width;
+        }
+
+        set
+        {
+            _width = value;
+        }
+    }
+
+    public int Height
+    {
+        get
+        {
+            return _height;
+        }
+
+        set
+        {
+            _height = value;
+        }
+    }
     #endregion
 
     protected InstalledObject(InstalledObject other)
@@ -153,6 +179,11 @@ public class InstalledObject: IXmlSerializable{
         if (other._updateActions != null)
         {
             this._updateActions = (Action<InstalledObject, float>)other._updateActions.Clone();
+        }
+
+        if(other.funcPositionValidation != null)
+        {
+            this.funcPositionValidation = (Func<Tile, bool>) other.funcPositionValidation.Clone();
         }
 
         this._checkEnterableState = other._checkEnterableState;
@@ -236,14 +267,24 @@ public class InstalledObject: IXmlSerializable{
 
     public bool _IsValidPosition(Tile tile)
     {
-        if(tile.Type != TileType.Floor)
+        for (int x_off = tile.X; x_off < (tile.X + Width); x_off++)
         {
-            return false;
-        }
+            for (int y_off = tile.Y; y_off < (tile.Y + Height); y_off++)
+            {
+                Tile t2 = tile.World.GetTileAt(x_off, y_off);
+                if(t2 != null)
+                {
+                    if (tile.Type != TileType.Floor)
+                    {
+                        return false;
+                    }
 
-        if(tile.InstalledObject != null)
-        {
-            return false;
+                    if (tile.InstalledObject != null)
+                    {
+                        return false;
+                    }
+                }
+            }
         }
 
         return true;

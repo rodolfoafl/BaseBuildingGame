@@ -9,7 +9,64 @@ public class BuildModeController : MonoBehaviour {
 
     bool _buildModeIsObject = false;
     string _buildModeObjectType;
-    TileType _buildModeTile = TileType.Floor;    
+    TileType _buildModeTile = TileType.Floor;
+
+    GameObject _installedObjectPreview;
+    InstalledObjectSpriteController _iOSC;
+    MouseController _mouseController;
+
+    void Start()
+    {
+        _world = WorldController.Instance.World;
+
+        _iOSC = FindObjectOfType<InstalledObjectSpriteController>();
+        _mouseController = FindObjectOfType<MouseController>();
+
+        _installedObjectPreview = new GameObject();
+        _installedObjectPreview.transform.SetParent(transform);
+        _installedObjectPreview.AddComponent<SpriteRenderer>().sortingLayerName = "Jobs";
+        _installedObjectPreview.SetActive(false);
+    }
+
+    void Update()
+    {
+        if(_buildModeIsObject && _buildModeObjectType != null && _buildModeObjectType != "")
+        {
+            ShowInstalledObjectSpriteAtTile(_buildModeObjectType, _mouseController.GetMouseOverTile());
+        }
+    }
+
+    public bool IsObjectDraggable()
+    {
+        if (!_buildModeIsObject)
+        {
+            return true;
+        }
+
+        InstalledObject prototype = _world.InstalledObjectPrototypes[_buildModeObjectType];
+        return prototype.LinksToNeighbor;
+    }
+
+    void ShowInstalledObjectSpriteAtTile(string objectType, Tile tile)
+    {
+        _installedObjectPreview.SetActive(true);
+
+        SpriteRenderer renderer = _installedObjectPreview.GetComponent<SpriteRenderer>();
+        renderer.sprite = _iOSC.GetSpriteForInstalledObject(objectType);
+
+        if (_world.IsInstalledObjectPlacementValid(_buildModeObjectType, tile))
+        {
+            renderer.color = new Color(0.5f, 1f, 0.5f, 0.25f);
+        }
+        else
+        {
+            renderer.color = new Color(1f, 0.5f, 0.5f, 0.25f);
+        }
+
+        InstalledObject prototype = _world.InstalledObjectPrototypes[objectType];
+        _installedObjectPreview.transform.position = new Vector3(tile.X + (prototype.Width - 1) / 2f, tile.Y + (prototype.Height - 1) / 2, 0);
+
+    }
 
     #region UI Related Methods
     public void SetMode_BuildFloor()
@@ -58,6 +115,8 @@ public class BuildModeController : MonoBehaviour {
                     Debug.LogError("There is no installedObject job prototype for: " + installedObjectType);
                     newJob = new Job(tile, installedObjectType, InstalledObjectAction.OnInstalledObjectJobCompleted, 0.1f, null);
                 }
+
+                newJob.InstalledObjectPrototype = _world.InstalledObjectPrototypes[installedObjectType];
 
                 tile.PendingInstalledObjectJob = newJob;
                 newJob.RegisterJobCancelledCallback((theJob) => { theJob.Tile.PendingInstalledObjectJob = null; });

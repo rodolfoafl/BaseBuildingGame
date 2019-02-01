@@ -63,6 +63,11 @@ public class MouseController : MonoBehaviour {
             _dragStartPosition = _currFramePosition;
         }
 
+        if (!_buildModeController.IsObjectDraggable())
+        {
+            _dragStartPosition = _currFramePosition;
+        }
+
         int start_x = Mathf.RoundToInt(_dragStartPosition.x);
         int end_x = Mathf.RoundToInt(_currFramePosition.x);
         if (end_x < start_x)

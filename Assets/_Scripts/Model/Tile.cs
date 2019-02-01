@@ -83,6 +83,11 @@ public class Tile {
         {
             return _installedObject;
         }
+
+        set
+        {
+            _installedObject = value;
+        }
     }
 
     public World World
@@ -156,21 +161,34 @@ public class Tile {
         this._y = y;
     }
 
+    public bool UnassignInstalledObject()
+    {
+        _installedObject = null;
+        return true;
+    }
+
     public bool AssignInstalledObject(InstalledObject objInstance)
     {
         if(objInstance == null)
         {
-            _installedObject = null;
-            return true;
+            return UnassignInstalledObject();
         }
 
-        if(_installedObject != null)
+        if (!objInstance.IsValidPosition(this))
         {
-            Debug.LogError("Trying to assign an installed object to a tile that already has one!");
+            Debug.LogError("Trying to assign an installed object to a tile that isn't valid!");
             return false;
         }
 
-        _installedObject = objInstance;
+        for (int x_off = X; x_off < (X + objInstance.Width); x_off++)
+        {
+            for (int y_off = Y; y_off < (Y + objInstance.Height); y_off++)
+            {
+                Tile tile = World.GetTileAt(x_off, y_off);
+                tile.InstalledObject = objInstance;
+            }
+        }
+
         return true;
     }
 

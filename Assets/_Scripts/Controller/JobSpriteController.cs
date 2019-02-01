@@ -34,7 +34,7 @@ public class JobSpriteController : MonoBehaviour {
         _jobGameObjectMap.Add(job, job_go);
 
         job_go.name = "JOB_" + job.JobObjectType + "_" + job.Tile.X + "_" + job.Tile.Y;
-        job_go.transform.position = new Vector3(job.Tile.X, job.Tile.Y, 0);
+        job_go.transform.position = new Vector3(job.Tile.X + (job.InstalledObjectPrototype.Width - 1) / 2f, job.Tile.Y + (job.InstalledObjectPrototype.Height - 1) / 2f, 0);
         job_go.transform.SetParent(this.transform, true);
 
         SpriteRenderer sp = job_go.AddComponent<SpriteRenderer>();

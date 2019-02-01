@@ -141,6 +141,19 @@ public class World : IXmlSerializable{
             _cbLooseObjectCreated = value;
         }
     }
+
+    public Dictionary<string, InstalledObject> InstalledObjectPrototypes
+    {
+        get
+        {
+            return _installedObjectPrototypes;
+        }
+
+        set
+        {
+            _installedObjectPrototypes = value;
+        }
+    }
     #endregion
 
     public World(int width, int height)
@@ -228,6 +241,9 @@ public class World : IXmlSerializable{
         _installedObjectPrototypes["Stockpile"].RegisterUpdateAction(InstalledObjectAction.Stockpile_UpdateAction);
         _installedObjectPrototypes["Stockpile"].Tint = new Color(1f, 0f, 0f, 1f);
         _installedObjectJobPrototypes.Add("Stockpile", new Job(null, "Stockpile", InstalledObjectAction.OnInstalledObjectJobCompleted, -1f, null));
+
+        InstalledObject o2GeneratorPrototype = new InstalledObject("O2Generator", 10, 2, 2, false, false);
+        _installedObjectPrototypes.Add("O2Generator", o2GeneratorPrototype);
     }
 
     public void RandomizeTiles()

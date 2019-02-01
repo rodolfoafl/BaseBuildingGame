@@ -27,7 +27,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
     void LoadSprites()
     {
-        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/NewSprites/Walls/");
+        Sprite[] sprites = Resources.LoadAll<Sprite>("_Sprites/NewSprites/");
         _stringSpritesMap = new Dictionary<string, Sprite>();
 
         foreach (Sprite s in sprites)
@@ -43,7 +43,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         _installedObjectGameObjectMap.Add(obj, instObj);
 
         instObj.name = obj.ObjectType + "_" + obj.Tile.X + "_" + obj.Tile.Y;
-        instObj.transform.position = new Vector3(obj.Tile.X, obj.Tile.Y, 0);
+        instObj.transform.position = new Vector3(obj.Tile.X + (obj.Width - 1) / 2f, obj.Tile.Y + (obj.Height - 1) / 2f, 0);
         instObj.transform.SetParent(this.transform, true);
 
         if (obj.ObjectType == "Door")
@@ -61,7 +61,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
         instObj.AddComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
         instObj.GetComponent<SpriteRenderer>().sortingLayerName = "InstalledObjects";
-        instObj.GetComponent<SpriteRenderer>().color = obj.Tint;
+        //instObj.GetComponent<SpriteRenderer>().color = obj.Tint;
 
         obj.RegisterOnInstalledObjectChangedCallback(OnInstalledObjectChanged);
     }
@@ -159,7 +159,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
             return;
         }
         inst_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(obj);
-        inst_go.GetComponent<SpriteRenderer>().color = obj.Tint;
+        //inst_go.GetComponent<SpriteRenderer>().color = obj.Tint;
 
         //Change Door sprite alpha to simulate opening/closing
         if (obj.ObjectType == "Door")

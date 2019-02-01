@@ -20,6 +20,8 @@ public class Job {
 
     Dictionary<string, LooseObject> _looseObjectRequeriments;
 
+    InstalledObject _installedObjectPrototype;
+
     #region Properties
     public Tile Tile
     {
@@ -122,6 +124,19 @@ public class Job {
         set
         {
             _canFetchFromStockpile = value;
+        }
+    }
+
+    public InstalledObject InstalledObjectPrototype
+    {
+        get
+        {
+            return _installedObjectPrototype;
+        }
+
+        set
+        {
+            _installedObjectPrototype = value;
         }
     }
     #endregion

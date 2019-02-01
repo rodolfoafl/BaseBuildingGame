@@ -56,3 +56,6 @@ TagManager:
   - name: Characters
     uniqueID: 3823119035
     locked: 0
+  - name: Jobs
+    uniqueID: 633056517
+    locked: 0
