@@ -1,55 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Room {
 
-    float _atmosO2 = 0f;
-    float _atmosN = 0f;
-    float _atmosC02 = 0f;
+    Dictionary<string, float> _atmosphericGasses;
 
     List<Tile> _tiles;
 
+    World _world;
+
     #region Properties
-    public float AtmosO2
-    {
-        get
-        {
-            return _atmosO2;
-        }
-
-        set
-        {
-            _atmosO2 = value;
-        }
-    }
-
-    public float AtmosN
-    {
-        get
-        {
-            return _atmosN;
-        }
-
-        set
-        {
-            _atmosN = value;
-        }
-    }
-
-    public float AtmosC02
-    {
-        get
-        {
-            return _atmosC02;
-        }
-
-        set
-        {
-            _atmosC02 = value;
-        }
-    }
-
     public List<Tile> Tiles
     {
         get
@@ -64,9 +26,11 @@ public class Room {
     }
     #endregion
 
-    public Room()
+    public Room(World world)
     {
+        this._world = world;
         _tiles = new List<Tile>();
+        _atmosphericGasses = new Dictionary<string, float>();
     }
 
     public void AssignTile(Tile tile)
@@ -108,7 +72,7 @@ public class Room {
         sourceObject.Tile.Room = null;
         oldRoom.Tiles.Remove(sourceObject.Tile);
 
-        if (oldRoom != world.GetOutsideRoom())
+        if (!oldRoom.IsOutsideRoom())
         {
             if(oldRoom.Tiles.Count > 0)
             {
@@ -128,7 +92,7 @@ public class Room {
             return;
         }
 
-        Room newRoom = new Room();
+        Room newRoom = new Room(oldRoom._world);
         Queue<Tile> tilesToCheck = new Queue<Tile>();
         tilesToCheck.Enqueue(tile);
 
@@ -158,10 +122,73 @@ public class Room {
             }
         }
 
-        newRoom.AtmosC02 = oldRoom.AtmosC02;
-        newRoom.AtmosN = oldRoom.AtmosN;
-        newRoom.AtmosO2 = oldRoom.AtmosO2;
+        newRoom.CopyGas(oldRoom);
 
         tile.World.AddRoom(newRoom);
+    }
+
+    public string[] GetGasNames()
+    {
+        return _atmosphericGasses.Keys.ToArray();
+    }
+
+    void CopyGas(Room other)
+    {
+        foreach(string n in other._atmosphericGasses.Keys)
+        {
+            this._atmosphericGasses[n] = other._atmosphericGasses[n];
+        }
+    }
+
+    public bool IsOutsideRoom()
+    {
+        return this == _world.GetOutsideRoom();
+    }
+
+    public void ChangeGas(string name, float amount)
+    {
+        if (IsOutsideRoom())
+        {
+            return;
+        }
+
+        if (_atmosphericGasses.ContainsKey(name))
+        {
+            _atmosphericGasses[name] += amount;
+        }
+        else
+        {
+            _atmosphericGasses[name] = amount;
+        }
+
+        if(_atmosphericGasses[name] < 0)
+        {
+            _atmosphericGasses[name] = 0;
+        }
+    }
+
+    public float GetGasAmount(string name)
+    {
+        if (_atmosphericGasses.ContainsKey(name))
+        {
+            return _atmosphericGasses[name];
+        }
+        return 0;
+    }
+
+    public float GetGasPercentage(string name)
+    {
+        if (!_atmosphericGasses.ContainsKey(name))
+        {
+            return 0;
+        }
+
+        float total = 0;
+        foreach (string n in _atmosphericGasses.Keys)
+        {
+            total += _atmosphericGasses[n];
+        }
+
+        return _atmosphericGasses[name] / total;
     }
 }

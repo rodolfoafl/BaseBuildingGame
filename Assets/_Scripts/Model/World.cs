@@ -173,7 +173,7 @@ public class World : IXmlSerializable{
         _jobQueue = new JobQueue();
 
         _rooms = new List<Room>();
-        _rooms.Add(new Room());
+        _rooms.Add(new Room(this));
 
         for (int x = 0; x < width; x++)
         {
@@ -244,6 +244,7 @@ public class World : IXmlSerializable{
 
         InstalledObject o2GeneratorPrototype = new InstalledObject("O2Generator", 10, 2, 2, false, false);
         _installedObjectPrototypes.Add("O2Generator", o2GeneratorPrototype);
+        _installedObjectPrototypes["O2Generator"].RegisterUpdateAction(InstalledObjectAction.OxygenGenerator_UpdateAction);
     }
 
     public void RandomizeTiles()

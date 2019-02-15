@@ -11,29 +11,40 @@ public class BuildModeController : MonoBehaviour {
     string _buildModeObjectType;
     TileType _buildModeTile = TileType.Floor;
 
-    GameObject _installedObjectPreview;
-    InstalledObjectSpriteController _iOSC;
     MouseController _mouseController;
+
+    #region Properties
+    public string BuildModeObjectType
+    {
+        get
+        {
+            return _buildModeObjectType;
+        }
+
+        set
+        {
+            _buildModeObjectType = value;
+        }
+    }
+
+    public bool BuildModeIsObject
+    {
+        get
+        {
+            return _buildModeIsObject;
+        }
+
+        set
+        {
+            _buildModeIsObject = value;
+        }
+    }
+    #endregion
 
     void Start()
     {
         _world = WorldController.Instance.World;
-
-        _iOSC = FindObjectOfType<InstalledObjectSpriteController>();
         _mouseController = FindObjectOfType<MouseController>();
-
-        _installedObjectPreview = new GameObject();
-        _installedObjectPreview.transform.SetParent(transform);
-        _installedObjectPreview.AddComponent<SpriteRenderer>().sortingLayerName = "Jobs";
-        _installedObjectPreview.SetActive(false);
-    }
-
-    void Update()
-    {
-        if(_buildModeIsObject && _buildModeObjectType != null && _buildModeObjectType != "")
-        {
-            ShowInstalledObjectSpriteAtTile(_buildModeObjectType, _mouseController.GetMouseOverTile());
-        }
     }
 
     public bool IsObjectDraggable()
@@ -47,44 +58,29 @@ public class BuildModeController : MonoBehaviour {
         return prototype.LinksToNeighbor;
     }
 
-    void ShowInstalledObjectSpriteAtTile(string objectType, Tile tile)
-    {
-        _installedObjectPreview.SetActive(true);
-
-        SpriteRenderer renderer = _installedObjectPreview.GetComponent<SpriteRenderer>();
-        renderer.sprite = _iOSC.GetSpriteForInstalledObject(objectType);
-
-        if (_world.IsInstalledObjectPlacementValid(_buildModeObjectType, tile))
-        {
-            renderer.color = new Color(0.5f, 1f, 0.5f, 0.25f);
-        }
-        else
-        {
-            renderer.color = new Color(1f, 0.5f, 0.5f, 0.25f);
-        }
-
-        InstalledObject prototype = _world.InstalledObjectPrototypes[objectType];
-        _installedObjectPreview.transform.position = new Vector3(tile.X + (prototype.Width - 1) / 2f, tile.Y + (prototype.Height - 1) / 2, 0);
-
-    }
-
     #region UI Related Methods
     public void SetMode_BuildFloor()
     {
         _buildModeIsObject = false;
         _buildModeTile = TileType.Floor;
+
+        _mouseController.StartBuildMode();
     }
 
     public void SetMode_Bulldoze()
     {
         _buildModeIsObject = false;
         _buildModeTile = TileType.Empty;
+
+        _mouseController.StartBuildMode();
     }
 
     public void SetMode_BuildInstalledObject(string objectType)
     {
         _buildModeIsObject = true;
         _buildModeObjectType = objectType;
+
+        _mouseController.StartBuildMode();
     }
 
     public void SetupPathfinding()

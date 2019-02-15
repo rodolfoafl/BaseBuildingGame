@@ -106,4 +106,16 @@ public static class InstalledObjectAction {
             }
         }
     }
+
+    public static void OxygenGenerator_UpdateAction(InstalledObject obj, float deltaTime)
+    {
+        if (obj.Tile.Room.GetGasAmount("02") < 0.2f)
+        {
+            obj.Tile.Room.ChangeGas("02", 0.01f * deltaTime);
+        }
+        else
+        {
+
+        }
+    }
 }

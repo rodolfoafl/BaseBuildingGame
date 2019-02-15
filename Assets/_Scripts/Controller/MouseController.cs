@@ -19,24 +19,58 @@ public class MouseController : MonoBehaviour {
     List<GameObject> _dragPreviewGameObjects;
 
     BuildModeController _buildModeController;
+    InstalledObjectSpriteController _iOSC;
+    MouseController _mouseController;
+
+    World _world;
+
+    bool _isDragging = false;
+
+    enum MouseMode
+    {
+        SELECT, BUILD
+    }
+
+    MouseMode _currentMode = MouseMode.SELECT;
 
     void Start()
     {
+        _world = WorldController.Instance.World;
+
         _dragPreviewGameObjects = new List<GameObject>();
         _buildModeController = FindObjectOfType<BuildModeController>();
+
+        _iOSC = FindObjectOfType<InstalledObjectSpriteController>();
+        _mouseController = FindObjectOfType<MouseController>();
     }
-	
-	void LateUpdate ()
+
+    void LateUpdate()
     {
         _currFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         _currFramePosition.z = 0;
 
-        //UpdateCursor();
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            if (_currentMode == MouseMode.BUILD)
+            {
+                _currentMode = MouseMode.SELECT;
+            }
+            else if (_currentMode == MouseMode.SELECT)
+            {
+                Debug.Log("Show game menu!");
+            }
+        }
+
         UpdateDragging();
         UpdateCameraMovement();
 
         _lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         _lastFramePosition.z = 0;
+    }
+
+    public void StartBuildMode()
+    {
+        _currentMode = MouseMode.BUILD;
     }
 
     public Vector3 GetMousePosition()
@@ -49,6 +83,30 @@ public class MouseController : MonoBehaviour {
         return WorldController.Instance.GetTileAtWorldCoordinate(_currFramePosition);
     }
 
+    void ShowInstalledObjectSpriteAtTile(string objectType, Tile tile)
+    {
+        GameObject go = new GameObject();
+        go.transform.SetParent(_cursorGameObjectsContainer, true);
+        _dragPreviewGameObjects.Add(go);
+
+        SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
+        renderer.sprite = _iOSC.GetSpriteForInstalledObject(objectType);
+        renderer.sortingLayerName = "Jobs";
+
+        if (_world.IsInstalledObjectPlacementValid(objectType, tile))
+        {
+            renderer.color = new Color(0.5f, 1f, 0.5f, 0.25f);
+        }
+        else
+        {
+            renderer.color = new Color(1f, 0.5f, 0.5f, 0.25f);
+        }
+
+        InstalledObject prototype = _world.InstalledObjectPrototypes[objectType];
+        go.transform.position = new Vector3(tile.X + (prototype.Width - 1) / 2f, tile.Y + (prototype.Height - 1) / 2, 0);
+
+    }
+
     #region Mouse Related Methods
     void UpdateDragging()
     {
@@ -57,10 +115,32 @@ public class MouseController : MonoBehaviour {
             return;
         }
 
+        //Clean old drag previews
+        for (int i = 0; i < _dragPreviewGameObjects.Count; i++)
+        {
+            SimplePool.Despawn(_dragPreviewGameObjects[i]);
+        }
+        _dragPreviewGameObjects.Clear();
+
+        if(_currentMode != MouseMode.BUILD)
+        {
+            return;
+        }
+
         //Start mouse drag
         if (Input.GetMouseButtonDown(0))
         {
             _dragStartPosition = _currFramePosition;
+            _isDragging = true;
+        }
+        else if(!_isDragging)
+        {
+            _dragStartPosition = _currFramePosition;
+        }
+
+        if (Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.Escape))
+        {
+            _isDragging = false;
         }
 
         if (!_buildModeController.IsObjectDraggable())
@@ -86,13 +166,6 @@ public class MouseController : MonoBehaviour {
             start_y = tmp;
         }
 
-        //Clean old drag previews
-        for (int i = 0; i < _dragPreviewGameObjects.Count; i++)
-        {
-            SimplePool.Despawn(_dragPreviewGameObjects[i]);
-        }
-        _dragPreviewGameObjects.Clear();
-
         /*while (_dragPreviewGameObjects.Count > 0)
         {
             GameObject go = _dragPreviewGameObjects[0];
@@ -100,8 +173,8 @@ public class MouseController : MonoBehaviour {
             SimplePool.Despawn(go);
         }*/
 
-        if (Input.GetMouseButton(0))
-        {
+        /*if (_isDragging)
+        {*/
             for (int x = start_x; x <= end_x; x++)
             {
                 for (int y = start_y; y <= end_y; y++)
@@ -109,17 +182,25 @@ public class MouseController : MonoBehaviour {
                     Tile t = WorldController.Instance.World.GetTileAt(x, y);
                     if (t != null)
                     {
-                        GameObject go = SimplePool.Spawn(_circleCursorPrefab, new Vector3(x, y, 0), Quaternion.identity);
-                        go.transform.SetParent(_cursorGameObjectsContainer, true);
-                        _dragPreviewGameObjects.Add(go);
+                        if (_buildModeController.BuildModeIsObject)
+                        {
+                            ShowInstalledObjectSpriteAtTile(_buildModeController.BuildModeObjectType, t);
+                        }
+                        else
+                        {
+                            GameObject go = SimplePool.Spawn(_circleCursorPrefab, new Vector3(x, y, 0), Quaternion.identity);
+                            go.transform.SetParent(_cursorGameObjectsContainer, true);
+                            _dragPreviewGameObjects.Add(go);
+                        }
                     }
                 }
             }
-        }
+        /*}*/
 
         //End mouse drag
-        if (Input.GetMouseButtonUp(0))
-        {          
+        if (_isDragging && Input.GetMouseButtonUp(0))
+        {
+            _isDragging = false;
             for (int x = start_x; x <= end_x; x++)
             {
                 for (int y = start_y; y <= end_y; y++)
